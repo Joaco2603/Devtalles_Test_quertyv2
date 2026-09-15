@@ -3,6 +3,8 @@
 import { GrainGradient } from "@paper-design/shaders-react";
 import { useState, type ReactNode, type FormEvent } from "react";
 import { motion } from "motion/react";
+import Image from "next/image";
+import Link from "next/link";
 
 // Apple-inspired spring physics (instant response, critically damped)
 const SPRING_TRANSITION = { type: "spring", damping: 30, stiffness: 350 } as const;
@@ -21,10 +23,10 @@ export default function AuthSectionOne() {
   };
 
   return (
-    <main className="relative h-[100dvh] max-h-[100dvh] w-full bg-neutral-100/70 p-2.5 sm:p-4 text-black antialiased [font-synthesis:none] dark:bg-[#050505] dark:text-white flex items-center justify-center overflow-hidden">
+    <main className="relative h-svh min-h-svh w-full bg-white p-2.5 sm:p-4 text-black antialiased [font-synthesis:none] dark:bg-[#050505] dark:text-white flex items-center justify-center overflow-hidden ">
       {/* Container chassis scaled to fit effortlessly within 100dvh */}
       <div className="grid h-full max-h-[640px] sm:max-h-[670px] lg:max-h-[620px] xl:max-h-[650px] w-full max-w-[1200px] grid-cols-1 lg:grid-cols-[0.96fr_1.04fr] gap-3 sm:gap-4 overflow-hidden">
-        
+
         {/* =========================================================================
             LEFT CARD: COMPACT LOGIN FORM
            ========================================================================= */}
@@ -32,11 +34,22 @@ export default function AuthSectionOne() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={SPRING_TRANSITION}
-          className="flex h-full flex-col justify-between rounded-2xl sm:rounded-3xl border border-black/10 bg-white p-5 sm:p-7 md:p-8 lg:p-8 xl:p-9 dark:border-white/10 dark:bg-[#0a0a0a] shadow-sm dark:shadow-2xl overflow-y-auto"
+          className="flex h-full flex-col justify-between rounded-2xl sm:rounded-3xl border border-black/10 bg-white px-6 py-10 sm:px-8 sm:py-12 lg:px-9 lg:py-14 dark:border-white/10 dark:bg-[#0a0a0a] shadow-sm dark:shadow-2xl overflow-y-auto"
         >
-          <div className="mx-auto w-full max-w-[420px]">
-            {/* Editorial Title & Subtitle (2-line limit, wide flow) */}
+          <div className="mx-auto w-full max-w-105 my-auto">
+            {/* Logo, Editorial Title & Subtitle */}
             <div>
+              <div className="">
+                <Image
+                  src="/img/logo.png"
+                  alt="Devtalles Logo"
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  className="size-8 sm:w-40 h-20 object-contain invert dark:invert-0 pb-4"
+                  priority
+                />
+              </div>
               <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-medium tracking-[-0.04em] leading-[1.1] text-neutral-950 dark:text-white">
                 Welcome back
               </h1>
@@ -126,12 +139,12 @@ export default function AuthSectionOne() {
           {/* Bottom Switcher */}
           <div className="mt-3 text-center text-xs text-black/55 dark:text-white/55">
             Don&apos;t have an account?{" "}
-            <a
-              href="#"
+            <Link
+              href="/register"
               className="font-medium text-black dark:text-white underline underline-offset-2 hover:text-[#FC7819] transition-colors"
             >
               Create an account
-            </a>
+            </Link>
           </div>
         </motion.div>
 
@@ -166,10 +179,10 @@ export default function AuthSectionOne() {
 
           {/* Content Header & Headline (2 lines max, wide container) */}
           <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[11px] font-mono backdrop-blur-sm">
+            {/* <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[11px] font-mono backdrop-blur-sm">
               <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
               WORKSPACE // CLUSTER 04
-            </div>
+            </div> */}
 
             <h2 className="mt-6 max-w-md text-4xl xl:text-[48px] font-medium tracking-[-0.05em] leading-[0.98] text-white">
               Think fast,

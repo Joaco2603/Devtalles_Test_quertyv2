@@ -79,7 +79,7 @@ export default function HeroSection8() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left shrink-0 z-20"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-[1.1] tracking-tight mb-5 max-w-[600px]">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-[1.1] tracking-tight mb-5 max-w-150">
             AI Agents That Code Like Your Best Engineer
           </h1>
 
@@ -89,11 +89,11 @@ export default function HeroSection8() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full md:w-auto mb-10">
-            <button className="w-full sm:w-[180px] h-[48px] rounded-xl bg-black text-white font-light text-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer shadow-[inset_3px_3px_3px_rgba(242,242,242,0.3),inset_-3px_-3px_3px_rgba(242,242,242,0.3)]">
+            <button className="w-full sm:w-45 h-12 rounded-xl bg-black text-white font-light text-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer shadow-[inset_3px_3px_3px_rgba(242,242,242,0.3),inset_-3px_-3px_3px_rgba(242,242,242,0.3)]">
               Book a demo
             </button>
 
-            <button className="w-full sm:w-[180px] h-[48px] rounded-xl border-[1.5px] border-black text-black font-light text-lg transition-all hover:scale-105 active:scale-95 hover:bg-black/5 cursor-pointer bg-transparent">
+            <button className="w-full sm:w-45 h-12 rounded-xl border-[1.5px] border-black text-black font-light text-lg transition-all hover:scale-105 active:scale-95 hover:bg-black/5 cursor-pointer bg-transparent">
               Try for free
             </button>
           </div>
@@ -113,7 +113,7 @@ export default function HeroSection8() {
                 </div>
               ))}
             </div>
-            <p className="text-sm md:text-base text-black/30 font-light max-w-[200px] leading-tight text-left">
+            <p className="text-sm md:text-base text-black/30 font-light max-w-50 leading-tight text-left">
               Trusted by the best people in 200+ companies
             </p>
           </div>
@@ -128,7 +128,7 @@ export default function HeroSection8() {
         >
           {/* Bounding Image Container - Force absolute width on large screens to break out of container correctly */}
           <div className="w-full lg:w-225 xl:w-300 p-3 lg:p-5 xl:p-8 bg-[#FFFFFF4A] rounded-[14px] shadow-2xl shrink-0">
-            <div className="relative w-full rounded-[10px] overflow-hidden border border-white/20 aspect-[1200/719]">
+            <div className="relative w-full rounded-[10px] overflow-hidden border border-white/20 aspect-1200/719">
               <Image
                 src="https://assets.solaceui.com/solaceui-hero-light.png"
                 alt="Dashboard App"
