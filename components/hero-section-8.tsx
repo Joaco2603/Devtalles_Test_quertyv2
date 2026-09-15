@@ -1,149 +1,182 @@
-"use client";
-import React from "react";
-import Image from "next/image";
-import { FlutedGlass } from "@paper-design/shaders-react";
-import { motion } from "motion/react";
-import Link from "next/link";
+'use client'
 
-const navItems = [
-  { name: "Product", href: "#" },
-  { name: "Customer", href: "#" },
-  { name: "Solution", href: "#" },
-  { name: "Pricing", href: "#" },
-  { name: "Company", href: "#" },
-];
+import { useState } from 'react'
+import { Dialog, DialogPanel } from '@headlessui/react'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { ArrowRight } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import LearnMoreButton from '@/components/pixel-perfect/learn-more-button'
 
-export default function HeroSection8() {
+const navigation = [
+  { name: 'Productos', href: '#' },
+  { name: 'Features', href: '#' },
+  { name: 'Marketplace', href: '#' },
+  { name: 'Log in', href: '/login' },
+]
+
+const HeroSection8 = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
   return (
-    <div className="relative w-full min-h-screen overflow-hidden antialiased [font-synthesis:none] [--color-primary:#9E73EA] bg-linear-to-b from-(--color-primary) to-white">
-      {/* Background Shader */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <FlutedGlass
-          size={0.89}
-          shape="lines"
-          angle={0}
-          distortionShape="prism"
-          distortion={0.5}
-          shift={0}
-          blur={0}
-          edges={0.25}
-          stretch={0}
-          scale={1.11}
-          fit="cover"
-          highlights={0.1}
-          shadows={0.2}
-          grainMixer={0.1}
-          grainOverlay={0.1}
-          colorBack="#00000000"
-          colorHighlight="#FFFFFF"
-          colorShadow="#000000"
-          className="w-full h-full bg-transparent"
-        />
-      </div>
-
-      {/* Navbar */}
-      <nav className="max-w-7xl mx-auto w-full flex justify-between items-center py-5 px-4 sm:px-6 relative z-10">
-        <div className="font-bold text-md tracking-tight text-white">SolaceUI</div>
-
-        <div className="items-center gap-4 hidden md:flex">
-          {navItems.map((item) => (
-            <Link href={item.href} key={item.name}>
-              <span className="text-sm md:text-[1rem] text-white/70 hover:text-white transition-colors">
-                {item.name}
-              </span>
-            </Link>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Link href="/login">
-            <button className="px-3 py-1 text-sm font-medium border border-white/20 text-white hover:bg-white/10 transition-colors rounded-sm cursor-pointer">
-              Log in
-            </button>
-          </Link>
-          <Link href="/register">
-            <button className="px-3 py-1 text-sm font-medium bg-black text-white hover:bg-black/80 transition-colors rounded-sm cursor-pointer">
-              Sign Up
-            </button>
-          </Link>
-        </div>
-      </nav>
-
-      {/* Hero Content */}
-      <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-start justify-between pt-12 md:pt-20 lg:pt-32 px-4 sm:px-6 max-w-7xl mx-auto gap-12 lg:gap-2">
-
-        {/* Left Column - Text & Actions */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left shrink-0 z-20"
-        >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-[1.1] tracking-tight mb-5 max-w-150">
-            AI Agents That Code Like Your Best Engineer
-          </h1>
-
-          <p className="text-base md:text-lg lg:text-xl text-[#FFFFFF80] font-light max-w-lg mb-8 leading-relaxed">
-            Autonomous agents that debug, refactor, and ship features while you
-            focus on architecture and strategy
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full md:w-auto mb-10">
-            <button className="w-full sm:w-45 h-12 rounded-xl bg-black text-white font-light text-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer shadow-[inset_3px_3px_3px_rgba(242,242,242,0.3),inset_-3px_-3px_3px_rgba(242,242,242,0.3)]">
-              Book a demo
-            </button>
-
-            <button className="w-full sm:w-45 h-12 rounded-xl border-[1.5px] border-black text-black font-light text-lg transition-all hover:scale-105 active:scale-95 hover:bg-black/5 cursor-pointer bg-transparent">
-              Try for free
-            </button>
+    <div className="bg-white dark:bg-gray-900">
+      <header className="absolute inset-x-0 top-0 z-50">
+        <div className="mx-auto max-w-7xl">
+          <div className="px-6 pt-6 lg:max-w-2xl lg:pr-0 lg:pl-8">
+            <nav aria-label="Global" className="flex items-center justify-between lg:justify-start">
+              <Link href="/" className="flex items-center gap-2 justify-center -m-1.5 p-1.5">
+                <span className="sr-only">Tu logo :D</span>
+                <span className="text-xl font-bold">{`{Dev/talles}`}</span>
+                <span
+                  className="h-8 w-auto not-dark:hidden invert dark:invert-0"
+                >{`{Dev/talles}`}</span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(true)}
+                className="-m-2.5 rounded-md p-2.5 text-gray-700 lg:hidden dark:text-gray-200"
+              >
+                <span className="sr-only">Open main menu</span>
+                <Bars3Icon aria-hidden="true" className="size-6" />
+              </button>
+              <div className="hidden lg:ml-12 lg:flex lg:gap-x-14">
+                {navigation.map((item) => (
+                  <a key={item.name} href={item.href} className="text-sm/6 font-semibold text-gray-900 dark:text-white">
+                    {item.name}
+                  </a>
+                ))}
+              </div>
+            </nav>
           </div>
+        </div>
+        <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
+          <div className="fixed inset-0 z-50" />
+          <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 dark:bg-gray-900 dark:sm:ring-gray-100/10">
+            <div className="flex items-center justify-between">
+              <Link href="#" className="-m-1.5 p-1.5">
+                <span className="sr-only">Your Company</span>
+                <Image
+                  alt=""
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  src="/img/logo.png"
+                  className="h-8 w-auto dark:hidden invert dark:invert-0"
+                />
+                <Image
+                  alt=""
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  src="/img/logo.png"
+                  className="h-8 w-auto not-dark:hidden invert dark:invert-0"
+                />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="-m-2.5 rounded-md p-2.5 text-gray-700 dark:text-gray-200"
+              >
+                <span className="sr-only">Close menu</span>
+                <XMarkIcon aria-hidden="true" className="size-6" />
+              </button>
+            </div>
+            <div className="mt-6 flow-root">
+              <div className="-my-6 divide-y divide-gray-500/10 dark:divide-white/10">
+                <div className="space-y-2 py-6">
+                  {navigation.map((item) => (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
+                    >
+                      {item.name}
+                    </a>
+                  ))}
+                </div>
+                <div className="py-6">
+                  <a
+                    href="#"
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
+                  >
+                    Log in
+                  </a>
+                </div>
+              </div>
+            </div>
+          </DialogPanel>
+        </Dialog>
+      </header>
 
-          {/* Testimonial Section */}
-          <div className="flex items-center gap-4">
-            <div className="flex -space-x-3">
-              {['one', 'two', 'three', 'four', 'five'].map((name, index) => (
-                <div key={index} className="w-10 h-10 rounded-full overflow-hidden shrink-0 relative">
-                  <Image
-                    src={`https://assets.solaceui.com/solaceui-member-${name}.png`}
-                    alt={`Team member ${index + 1}`}
-                    fill
-                    className="object-cover object-top"
-                    unoptimized
+      <div className="relative">
+        <div className="mx-auto max-w-7xl">
+          <div className="relative z-10 pt-14 lg:w-full lg:max-w-2xl">
+            <svg
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+              className="absolute inset-y-0 right-8 hidden h-full w-80 translate-x-1/2 transform fill-white lg:block dark:fill-gray-900"
+            >
+              <polygon points="0,0 90,0 50,100 0,100" />
+            </svg>
+
+            {/* section text */}
+            <div className="relative px-6 py-28 sm:py-36 lg:px-8 lg:py-36 lg:pr-0">
+              <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl">
+                {/* Eyebrow Badge with interactive LearnMoreButton effects */}
+                <div className="mb-7 flex">
+                  <LearnMoreButton
+                    href="/register"
+                    badge="2026"
+                    text="Roadmaps de Programación"
+                    actionText="Explorar"
+                    boxShadow=''
                   />
                 </div>
-              ))}
-            </div>
-            <p className="text-sm md:text-base text-black/30 font-light max-w-50 leading-tight text-left">
-              Trusted by the best people in 200+ companies
-            </p>
-          </div>
-        </motion.div>
 
-        {/* Right Column - Image Section */}
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-          className="w-full lg:w-1/2 relative flex justify-start lg:ml-8 xl:ml-16 pointer-events-none"
-        >
-          {/* Bounding Image Container - Force absolute width on large screens to break out of container correctly */}
-          <div className="w-full lg:w-225 xl:w-300 p-3 lg:p-5 xl:p-8 bg-[#FFFFFF4A] rounded-[14px] shadow-2xl shrink-0">
-            <div className="relative w-full rounded-[10px] overflow-hidden border border-white/20 aspect-1200/719">
-              <Image
-                src="https://assets.solaceui.com/solaceui-hero-light.png"
-                alt="Dashboard App"
-                fill
-                className="object-cover object-top"
-                priority
-                unoptimized
-              />
+                {/* Headline H1 with optical tracking & tight leading */}
+                <h1 className="text-4xl font-semibold tracking-[-0.035em] text-pretty text-neutral-950 sm:text-5xl lg:text-[3.25rem] leading-[1.12] dark:text-white">
+                  El roadmap exacto para aprender a programar lo que imaginas
+                </h1>
+
+                {/* Subtitle */}
+                <p className="mt-6 text-base sm:text-lg font-normal leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-lg tracking-[-0.01em]">
+                  Rutas paso a paso diseñadas para llevarte desde tus primeras líneas de código hasta desarrollar aplicaciones reales y dominar las tecnologías que necesitas.
+                </p>
+
+                {/* Moderate High-End Action CTAs */}
+                <div className="mt-8 sm:mt-10 flex flex-wrap items-center gap-3.5 sm:gap-4">
+                  <Link
+                    href="/register"
+                    className="group inline-flex items-center justify-center gap-2.5 rounded-full bg-purple-600 dark:bg-purple-600 px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold text-white dark:text-neutral-950 shadow-sm transition-all duration-150 ease-out hover:bg-purple-700 dark:hover:bg-purple-700 active:scale-[0.98] cursor-pointer"
+                  >
+                    <span>Descubrir mi ruta</span>
+                    <span className="flex size-4.5 items-center justify-center rounded-full bg-white/15 dark:bg-black/10 transition-transform duration-200 ease-out group-hover:translate-x-0.5">
+                      <ArrowRight className="size-2.5 stroke-[2.5]" />
+                    </span>
+                  </Link>
+
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center justify-center rounded-full border border-purple-600 dark:border-purple-600 bg-transparent px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold text-purple-600 dark:text-purple-600 transition-all duration-150 ease-out hover:border-purple-400 dark:hover:border-purple-600 hover:bg-purple-100/20 dark:hover:bg-purple-800/20 active:scale-[0.98] cursor-pointer"
+                  >
+                    Ver roadmaps
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
+        <div className="bg-gray-50 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 dark:bg-gray-800">
+          <img
+            alt=""
+            src="https://images.unsplash.com/photo-1483389127117-b6a2102724ae?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
+            className="aspect-3/2 object-cover lg:aspect-auto lg:size-full"
+          />
+        </div>
       </div>
-
-      {/* Bottom Fade Gradient */}
-      <div className="absolute bottom-0 left-0 w-full h-32 md:h-48 z-30 pointer-events-none bg-linear-to-t from-white to-transparent" />
     </div>
-  );
+  )
 }
+
+export default HeroSection8

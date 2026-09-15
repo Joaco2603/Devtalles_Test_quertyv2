@@ -25,7 +25,7 @@ export default function AuthSectionOne() {
   return (
     <main className="relative h-svh min-h-svh w-full bg-white p-2.5 sm:p-4 text-black antialiased [font-synthesis:none] dark:bg-[#050505] dark:text-white flex items-center justify-center overflow-hidden ">
       {/* Container chassis scaled to fit effortlessly within 100dvh */}
-      <div className="grid h-full max-h-[640px] sm:max-h-[670px] lg:max-h-[620px] xl:max-h-[650px] w-full max-w-[1200px] grid-cols-1 lg:grid-cols-[0.96fr_1.04fr] gap-3 sm:gap-4 overflow-hidden">
+      <div className="grid h-full max-h-160 sm:max-h-167.5 lg:max-h-168.75 xl:max-h-172.25 w-full max-w-300 grid-cols-1 lg:grid-cols-[0.96fr_1.04fr] gap-3 sm:gap-4 overflow-hidden">
 
         {/* =========================================================================
             LEFT CARD: COMPACT LOGIN FORM
@@ -39,7 +39,7 @@ export default function AuthSectionOne() {
           <div className="mx-auto w-full max-w-105 my-auto">
             {/* Logo, Editorial Title & Subtitle */}
             <div>
-              <div className="">
+              <Link href="/" className="">
                 <Image
                   src="/img/logo.png"
                   alt="Devtalles Logo"
@@ -49,7 +49,7 @@ export default function AuthSectionOne() {
                   className="size-8 sm:w-40 h-20 object-contain invert dark:invert-0 pb-4"
                   priority
                 />
-              </div>
+              </Link>
               <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-medium tracking-[-0.04em] leading-[1.1] text-neutral-950 dark:text-white">
                 Welcome back
               </h1>
@@ -175,7 +175,7 @@ export default function AuthSectionOne() {
           />
 
           {/* Vignette overlay */}
-          <div className="pointer-events-none absolute inset-0 z-1 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
+          <div className="pointer-events-none absolute inset-0 z-1 bg-linear-to-t from-black/80 via-transparent to-black/40" />
 
           {/* Content Header & Headline (2 lines max, wide container) */}
           <div className="relative z-10">
@@ -193,21 +193,19 @@ export default function AuthSectionOne() {
 
           {/* Bottom Desktop Download Island */}
           <div className="relative z-10 flex items-center justify-between gap-3 pt-4">
-            <a
-              href="#"
+            <div
               className="inline-flex h-10 items-center gap-2.5 rounded-xl border border-white/25 bg-black/30 px-4 text-xs sm:text-sm font-medium text-white/90 backdrop-blur-md transition-all duration-150 ease-out active:scale-[0.98] hover:border-white/50 hover:bg-black/50 hover:text-white"
             >
               <WindowsIcon className="size-4 shrink-0" />
               <span className="truncate">Download for Windows</span>
-            </a>
+            </div>
 
-            <a
-              href="#"
+            <div
               className="inline-flex h-10 items-center gap-2.5 rounded-xl border border-white/25 bg-black/30 px-4 text-xs sm:text-sm font-medium text-white/90 backdrop-blur-md transition-all duration-150 ease-out active:scale-[0.98] hover:border-white/50 hover:bg-black/50 hover:text-white"
             >
               <AppleIcon className="size-4 shrink-0" />
               <span className="truncate">macOS</span>
-            </a>
+            </div>
           </div>
         </motion.div>
       </div>
@@ -223,7 +221,7 @@ function SocialButton({ icon, label }: { icon: ReactNode; label: string }) {
   return (
     <button
       type="button"
-      className="flex h-10 items-center justify-center gap-2 rounded-xl border border-black/15 bg-white px-3 text-xs sm:text-[13px] font-medium text-black transition-all duration-150 ease-out active:scale-[0.98] hover:bg-black/[0.04] dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 cursor-pointer"
+      className="flex h-10 items-center justify-center gap-2 rounded-xl border border-black/15 bg-white px-3 text-xs sm:text-[13px] font-medium text-black transition-all duration-150 ease-out active:scale-[0.98] hover:bg-black/4 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 cursor-pointer"
     >
       <span className="shrink-0">{icon}</span>
       <span className="truncate">{label}</span>

@@ -133,7 +133,7 @@ export default function AuthSectionTwo() {
           <div className="mx-auto w-full max-w-105 text-center my-auto">
             {/* Logo, Header */}
             <div>
-              <div className="flex justify-center">
+              <Link href="/" className="flex justify-center">
                 <Image
                   src="/img/logo.png"
                   alt="Devtalles Logo"
@@ -143,7 +143,7 @@ export default function AuthSectionTwo() {
                   className="size-8 sm:w-40 h-20 object-contain invert dark:invert-0 pb-4"
                   priority
                 />
-              </div>
+              </Link>
               <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-medium tracking-[-0.04em] leading-tight text-neutral-950 dark:text-white">
                 Create an account
               </h1>
@@ -335,16 +335,6 @@ function CheckboxLine({ children }: { children: ReactNode }) {
       </span>
       <span>{children}</span>
     </label>
-  );
-}
-
-function MidjourneyLogo({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 32 32" className={className} fill="none" aria-hidden="true">
-      <path d="M5 25.5c5.4-3.3 9-9.7 9.8-18.8 5.2 5.5 8 11.8 8.8 18.8H5Z" stroke="currentColor" strokeWidth="1.4" />
-      <path d="M8 23.5h18M10.5 20.5h12.8M12.7 17.5h8.6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <path d="M14.9 6.8c-1.1 7.6.7 13.4 5.3 17" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
   );
 }
 
