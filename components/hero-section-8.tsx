@@ -7,12 +7,13 @@ import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import LearnMoreButton from '@/components/pixel-perfect/learn-more-button'
+import RippleTouch from './pixel-perfect/ripple-touch'
+import MagneticWarp from './pixel-perfect/magnetic-warp'
 
 const navigation = [
   { name: 'Productos', href: '#' },
   { name: 'Features', href: '#' },
   { name: 'Marketplace', href: '#' },
-  { name: 'Log in', href: '/login' },
 ]
 
 const HeroSection8 = () => {
@@ -23,14 +24,39 @@ const HeroSection8 = () => {
       <header className="absolute inset-x-0 top-0 z-50">
         <div className="mx-auto max-w-7xl">
           <div className="px-6 pt-6 lg:max-w-2xl lg:pr-0 lg:pl-8">
-            <nav aria-label="Global" className="flex items-center justify-between lg:justify-start">
-              <Link href="/" className="flex items-center gap-2 justify-center -m-1.5 p-1.5">
-                <span className="sr-only">Tu logo :D</span>
-                <span className="text-xl font-bold">{`{Dev/talles}`}</span>
-                <span
-                  className="h-8 w-auto not-dark:hidden invert dark:invert-0"
-                >{`{Dev/talles}`}</span>
-              </Link>
+            <nav aria-label="Global" className="flex items-center justify-between">
+              <div className="flex items-center gap-x-8 lg:gap-x-10">
+                <Link href="/" className="flex items-center gap-2 justify-center -m-1.5 p-1.5">
+                  <span className="sr-only">Tu logo :D</span>
+                  <span className="text-xl font-bold">{`{Dev/talles}`}</span>
+                  <span
+                    className="h-8 w-auto not-dark:hidden invert dark:invert-0"
+                  >{`{Dev/talles}`}</span>
+                </Link>
+                <div className="hidden lg:flex lg:items-center lg:gap-x-8">
+                  {navigation.map((item) => (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      className="text-sm font-medium text-neutral-600 transition-colors duration-150 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white"
+                    >
+                      {item.name}
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              {/* Differentiated Apple-style Login button (Desktop) */}
+              <div className="hidden lg:flex lg:items-center">
+                <Link
+                  href="/login"
+                  className="group relative inline-flex items-center justify-center rounded-full border border-purple-600/10 bg-purple-600/10 px-4 py-1.5 text-xs sm:text-sm font-medium tracking-tight text-neutral-800 shadow-sm backdrop-blur-md transition-all duration-150 ease-out hover:border-purple-600/15 hover:bg-purple-600/10 hover:text-purple-600 active:scale-[0.96] active:bg-neutral-900/10 dark:border-white/12 dark:bg-white/8 dark:text-neutral-200 dark:shadow-sm dark:hover:border-white/18 dark:hover:bg-white/12 dark:hover:text-white dark:active:bg-white/16 cursor-pointer"
+                >
+                  Log in
+                </Link>
+              </div>
+
+              {/* Mobile hamburger menu toggle */}
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
@@ -39,13 +65,6 @@ const HeroSection8 = () => {
                 <span className="sr-only">Open main menu</span>
                 <Bars3Icon aria-hidden="true" className="size-6" />
               </button>
-              <div className="hidden lg:ml-12 lg:flex lg:gap-x-14">
-                {navigation.map((item) => (
-                  <a key={item.name} href={item.href} className="text-sm/6 font-semibold text-gray-900 dark:text-white">
-                    {item.name}
-                  </a>
-                ))}
-              </div>
             </nav>
           </div>
         </div>
@@ -94,6 +113,7 @@ const HeroSection8 = () => {
                     <a
                       key={item.name}
                       href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
                       className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
                     >
                       {item.name}
@@ -103,7 +123,8 @@ const HeroSection8 = () => {
                 <div className="py-6">
                   <Link
                     href="/login"
-                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex w-full items-center justify-center rounded-full border border-neutral-900/10 bg-neutral-900/[0.04] px-4 py-2.5 text-sm font-medium tracking-tight text-neutral-800 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-md transition-all duration-150 ease-out hover:border-neutral-900/15 hover:bg-neutral-900/[0.07] hover:text-neutral-950 active:scale-[0.97] dark:border-white/[0.12] dark:bg-white/[0.08] dark:text-neutral-200 dark:shadow-[0_1px_2px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.12)] dark:hover:border-white/[0.18] dark:hover:bg-white/[0.12] dark:hover:text-white"
                   >
                     Log in
                   </Link>
@@ -174,9 +195,16 @@ const HeroSection8 = () => {
           </div>
         </div>
         <div className="bg-gray-50 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 dark:bg-gray-800">
-          <img
+          {/* <img
             alt=""
-            src="https://images.unsplash.com/photo-1483389127117-b6a2102724ae?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
+            src="https://cdn.cosmos.so/66f53774-ad96-4c47-9f2f-1e022865a82d?format=webp"
+            // src="https://images.unsplash.com/photo-1483389127117-b6a2102724ae?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
+            className="aspect-3/2 object-cover lg:aspect-auto lg:size-full"
+          /> */}
+          <MagneticWarp
+            // image='https://cdn.cosmos.so/b34094d1-8f3d-4b98-b796-51e0056e6fa0?format=webp'
+            // image='https://cdn.cosmos.so/1177f14b-f9f4-4a4a-ad41-d84ade65617a?format=webp'
+            image='https://cdn.cosmos.so/6173519b-0c48-446c-869b-aef38b0fe70e?format=webp'
             className="aspect-3/2 object-cover lg:aspect-auto lg:size-full"
           />
         </div>
