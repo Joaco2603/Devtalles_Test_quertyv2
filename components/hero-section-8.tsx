@@ -55,22 +55,28 @@ const HeroSection8 = () => {
             <div className="flex items-center justify-between">
               <Link href="#" className="-m-1.5 p-1.5">
                 <span className="sr-only">Your Company</span>
-                <Image
+                {/* <Image
                   alt=""
                   width={0}
                   height={0}
                   sizes="100vw"
                   src="/img/logo.png"
                   className="h-8 w-auto dark:hidden invert dark:invert-0"
-                />
-                <Image
+                /> */}
+                <span
+                  className="h-8 w-auto dark:hidden text-xl font-bold"
+                >{`{Dev/talles}`}</span>
+                <span
+                  className="h-8 w-auto not-dark:hidden dark:text-white text-xl font-bold"
+                >{`{Dev/talles}`}</span>
+                {/* <Image
                   alt=""
                   width={0}
                   height={0}
                   sizes="100vw"
                   src="/img/logo.png"
                   className="h-8 w-auto not-dark:hidden invert dark:invert-0"
-                />
+                /> */}
               </Link>
               <button
                 type="button"
@@ -95,12 +101,12 @@ const HeroSection8 = () => {
                   ))}
                 </div>
                 <div className="py-6">
-                  <a
-                    href="#"
+                  <Link
+                    href="/login"
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
                   >
                     Log in
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

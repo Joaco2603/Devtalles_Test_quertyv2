@@ -134,21 +134,15 @@ export default function AuthSectionTwo() {
             {/* Logo, Header */}
             <div>
               <Link href="/" className="flex justify-center">
-                <Image
-                  src="/img/logo.png"
-                  alt="Devtalles Logo"
-                  width={0}
-                  height={0}
-                  sizes="100vw"
-                  className="size-8 sm:w-40 h-20 object-contain invert dark:invert-0 pb-4"
-                  priority
-                />
+                <span
+                  className="text-3xl font-bold"
+                >{`{Dev/talles}`}</span>
               </Link>
-              <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-medium tracking-[-0.04em] leading-tight text-neutral-950 dark:text-white">
-                Create an account
+              <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold tracking-[-0.04em] leading-tight text-purple-600 dark:text-white">
+                Crear una cuenta
               </h1>
               <p className="mt-0.5 text-xs text-black/55 dark:text-white/55">
-                Join the collaborative creative network
+                Únete a la red creativa colaborativa
               </p>
             </div>
 
@@ -170,7 +164,7 @@ export default function AuthSectionTwo() {
 
             {/* Form */}
             <form
-              onSubmit={(e: FormEvent) => {
+              onSubmit={(e) => {
                 e.preventDefault();
               }}
               className="space-y-2 sm:space-y-2.5 text-left"
@@ -193,7 +187,7 @@ export default function AuthSectionTwo() {
               {/* Submit CTA (Instant press physics, Apple-inspired) */}
               <button
                 type="submit"
-                className="mt-10 flex h-10 sm:h-11 w-full items-center justify-center rounded-xl bg-black text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 cursor-pointer shadow-sm"
+                className="mt-10 flex h-10 sm:h-11 w-full items-center justify-center rounded-xl bg-purple-600 text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-purple-700 dark:bg-purple-600 dark:text-black dark:hover:bg-purple-400 cursor-pointer shadow-sm"
               >
                 Crear Cuenta
               </button>

@@ -36,21 +36,15 @@ export default function AuthSectionOne() {
           transition={SPRING_TRANSITION}
           className="flex h-full flex-col justify-between rounded-2xl sm:rounded-3xl border border-black/10 bg-white px-6 py-10 sm:px-8 sm:py-12 lg:px-9 lg:py-14 dark:border-white/10 dark:bg-[#0a0a0a] shadow-sm dark:shadow-2xl overflow-y-auto"
         >
-          <div className="mx-auto w-full max-w-105 my-auto">
+          <div className="mx-auto w-full max-w-105 text-center my-auto space-y-5">
             {/* Logo, Editorial Title & Subtitle */}
             <div>
-              <Link href="/" className="">
-                <Image
-                  src="/img/logo.png"
-                  alt="Devtalles Logo"
-                  width={0}
-                  height={0}
-                  sizes="100vw"
-                  className="size-8 sm:w-40 h-20 object-contain invert dark:invert-0 pb-4"
-                  priority
-                />
+              <Link href="/" className="flex justify-center">
+                <span
+                  className="text-3xl font-bold"
+                >{`{Dev/talles}`}</span>
               </Link>
-              <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-medium tracking-[-0.04em] leading-[1.1] text-neutral-950 dark:text-white">
+              <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold tracking-[-0.04em] leading-tight text-purple-600 dark:text-white">
                 Bienvenido de nuevo
               </h1>
               <p className="mt-1 text-xs sm:text-sm text-black/60 dark:text-white/60 tracking-tight">
@@ -128,7 +122,7 @@ export default function AuthSectionOne() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="mt-10 flex h-11 sm:h-11.5 w-full items-center justify-center gap-2 rounded-xl bg-black text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 disabled:opacity-75 cursor-pointer shadow-sm"
+                className="mt-10 flex h-11 sm:h-11.5 w-full items-center justify-center gap-2 rounded-xl bg-purple-600 text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-purple-700 dark:bg-purple-600 dark:text-black dark:hover:bg-purple-400 disabled:opacity-75 cursor-pointer shadow-sm"
               >
                 <span>{isLoading ? "Iniciando sesión..." : "Inicia sesión"}</span>
                 <ArrowRightIcon className="size-4" />
