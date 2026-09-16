@@ -185,29 +185,29 @@ export default function AuthSectionTwo() {
               <FieldBox label="Password" value="*************" type="password" />
 
               {/* Checkboxes */}
-              <div className="space-y-1.5 pt-1 text-[11px] sm:text-xs leading-4 text-black/50 dark:text-white/50">
-                <CheckboxLine>I don&apos;t want to receive promotional emails about feature updates</CheckboxLine>
-                <CheckboxLine>{termsText}</CheckboxLine>
-              </div>
+              {/* <div className="space-y-1.5 pt-1 text-[11px] sm:text-xs leading-4 text-black/50 dark:text-white/50"> */}
+              {/* <CheckboxLine>I don&apos;t want to receive promotional emails about feature updates</CheckboxLine> */}
+              {/* <CheckboxLine>{termsText}</CheckboxLine> */}
+              {/* </div> */}
 
               {/* Submit CTA (Instant press physics, Apple-inspired) */}
               <button
                 type="submit"
-                className="mt-2.5 flex h-10 sm:h-11 w-full items-center justify-center rounded-xl bg-black text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 cursor-pointer shadow-sm"
+                className="mt-10 flex h-10 sm:h-11 w-full items-center justify-center rounded-xl bg-black text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 cursor-pointer shadow-sm"
               >
-                Submit
+                Crear Cuenta
               </button>
             </form>
           </div>
 
           {/* Bottom Switcher */}
           <div className="mt-3 text-center text-xs text-black/55 dark:text-white/55">
-            Already have an account?{" "}
+            ¿Ya tienes una cuenta?{" "}
             <Link
               href="/login"
-              className="font-medium text-black dark:text-white underline underline-offset-2 hover:text-[#FC7819] transition-colors"
+              className="font-semibold text-black dark:text-white underline underline-offset-2 hover:text-purple-600 transition-colors"
             >
-              Sign in
+              Inicia sesión
             </Link>
           </div>
         </motion.div>

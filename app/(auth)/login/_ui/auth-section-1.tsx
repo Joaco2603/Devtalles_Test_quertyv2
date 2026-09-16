@@ -51,10 +51,10 @@ export default function AuthSectionOne() {
                 />
               </Link>
               <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-medium tracking-[-0.04em] leading-[1.1] text-neutral-950 dark:text-white">
-                Welcome back
+                Bienvenido de nuevo
               </h1>
               <p className="mt-1 text-xs sm:text-sm text-black/60 dark:text-white/60 tracking-tight">
-                Brainstorm in chat, build together in cowork.
+                Lluvia de ideas en chat, construye juntos en cowork.
               </p>
             </div>
 
@@ -70,7 +70,7 @@ export default function AuthSectionOne() {
                 <div className="w-full border-t border-black/10 dark:border-white/10" />
               </div>
               <div className="relative bg-white dark:bg-[#0a0a0a] px-3 text-[11px] font-medium text-black/45 dark:text-white/45 uppercase tracking-wider">
-                or
+                o
               </div>
             </div>
 
@@ -105,8 +105,8 @@ export default function AuthSectionOne() {
               />
 
               {/* Remember Me & Forgot Password row */}
-              <div className="flex items-center justify-between pt-0.5 text-xs">
-                <label className="flex items-center gap-2 cursor-pointer select-none text-black/70 dark:text-white/70">
+              {/* <div className="flex items-center justify-between pt-0.5 text-xs"> */}
+              {/* <label className="flex items-center gap-2 cursor-pointer select-none text-black/70 dark:text-white/70">
                   <input
                     type="checkbox"
                     checked={rememberMe}
@@ -114,23 +114,23 @@ export default function AuthSectionOne() {
                     className="size-3.5 rounded border-black/20 dark:border-white/20 accent-[#FC7819] cursor-pointer"
                   />
                   <span>Remember me</span>
-                </label>
+                </label> */}
 
-                <a
+              {/* <a
                   href="#"
                   className="font-medium text-black/60 hover:text-[#FC7819] dark:text-white/60 dark:hover:text-[#FC7819] transition-colors"
                 >
                   Forgot password?
-                </a>
-              </div>
+                </a> */}
+              {/* </div> */}
 
               {/* Submit CTA (Instant feedback, Apple press physics) */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="mt-2 flex h-11 sm:h-11.5 w-full items-center justify-center gap-2 rounded-xl bg-black text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 disabled:opacity-75 cursor-pointer shadow-sm"
+                className="mt-10 flex h-11 sm:h-11.5 w-full items-center justify-center gap-2 rounded-xl bg-black text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 disabled:opacity-75 cursor-pointer shadow-sm"
               >
-                <span>{isLoading ? "Signing in..." : "Sign in"}</span>
+                <span>{isLoading ? "Iniciando sesión..." : "Inicia sesión"}</span>
                 <ArrowRightIcon className="size-4" />
               </button>
             </form>
@@ -138,12 +138,12 @@ export default function AuthSectionOne() {
 
           {/* Bottom Switcher */}
           <div className="mt-3 text-center text-xs text-black/55 dark:text-white/55">
-            Don&apos;t have an account?{" "}
+            ¿No tienes una cuenta?{" "}
             <Link
               href="/register"
-              className="font-medium text-black dark:text-white underline underline-offset-2 hover:text-[#FC7819] transition-colors"
+              className="font-medium text-black dark:text-white underline underline-offset-2 hover:text-purple-600 transition-colors"
             >
-              Create an account
+              Crea una cuenta
             </Link>
           </div>
         </motion.div>
@@ -184,7 +184,7 @@ export default function AuthSectionOne() {
               WORKSPACE // CLUSTER 04
             </div> */}
 
-            <h2 className="mt-6 max-w-md text-4xl xl:text-[48px] font-medium tracking-[-0.05em] leading-[0.98] text-white">
+            <h2 className="mt-6 max-w-md text-4xl xl:text-[48px] font-medium tracking-tighter leading-[0.98] text-white">
               Think fast,
               <br />
               Build faster
