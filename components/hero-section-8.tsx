@@ -7,6 +7,7 @@ import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import LearnMoreButton from '@/components/pixel-perfect/learn-more-button'
 import MagneticWarp from './pixel-perfect/magnetic-warp'
+import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import DrawSVGPlugin from 'gsap/DrawSVGPlugin'
 
@@ -25,7 +26,7 @@ const svgVariants = [
   `<svg width="310" height="40" viewBox="0 0 310 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 29.8857C52.3147 26.9322 99.4329 21.6611 146.503 17.1765C151.753 16.6763 157.115 15.9505 162.415 15.6551C163.28 15.6069 165.074 15.4123 164.383 16.4275C161.704 20.3627 157.134 23.7551 153.95 27.4983C153.209 28.3702 148.194 33.4751 150.669 34.6605C153.638 36.0819 163.621 32.6063 165.039 32.2029C178.55 28.3608 191.49 23.5968 204.869 19.5404C231.903 11.3436 259.347 5.83254 288.793 5.12258C294.094 4.99476 299.722 4.82265 305 5.45025" stroke="#E55050" stroke-width="10" stroke-linecap="round"/></svg>`
 ];
 
-gsap.registerPlugin(DrawSVGPlugin);
+gsap.registerPlugin(DrawSVGPlugin, useGSAP);
 
 let nextIndex: number | null = null;
 
@@ -129,6 +130,97 @@ const DrawLineLink = ({ href, children, className = '', onClick }: DrawLineLinkP
   );
 };
 
+interface MobileMenuContentProps {
+  onClose: () => void;
+}
+
+const MobileMenuContent = ({ onClose }: MobileMenuContentProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      // Smooth fade-in for backdrop
+      gsap.from('.mobile-backdrop', {
+        opacity: 0,
+        duration: 0.35,
+        ease: 'power2.out',
+      });
+
+      // Smooth fade-in and slide from right for panel
+      gsap.from('.mobile-panel', {
+        opacity: 0,
+        x: 28,
+        duration: 0.35,
+        ease: 'power3.out',
+      });
+
+      // Soft cascading entrance for navigation items
+      gsap.from('.mobile-nav-item', {
+        opacity: 0,
+        x: 12,
+        duration: 0.25,
+        stagger: 0.04,
+        delay: 0.08,
+        ease: 'power2.out',
+      });
+    },
+    { scope: containerRef }
+  );
+
+  return (
+    <div ref={containerRef}>
+      <div
+        className="mobile-backdrop fixed inset-0 z-50 bg-black/25 backdrop-blur-xs dark:bg-black/50"
+        aria-hidden="true"
+      />
+      <DialogPanel className="mobile-panel fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 dark:bg-gray-900 dark:sm:ring-gray-100/10">
+        <div className="flex items-center justify-between">
+          <Link href="/" className="flex items-center h-8" onClick={onClose}>
+            <span className="sr-only">Your Company</span>
+            <span className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-white leading-none">
+              {`{Dev/talles}`}
+            </span>
+          </Link>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex items-center justify-center size-8 rounded-md text-gray-700 dark:text-gray-200"
+          >
+            <span className="sr-only">Close menu</span>
+            <XMarkIcon aria-hidden="true" className="size-6" />
+          </button>
+        </div>
+        <div className="mt-6 flow-root">
+          <div className="-my-6 divide-y divide-gray-500/10 dark:divide-white/10">
+            <div className="flex flex-col space-y-2 py-6">
+              {navigation.map((item) => (
+                <div key={item.name} className="mobile-nav-item">
+                  <DrawLineLink
+                    href={item.href}
+                    onClick={onClose}
+                    className="text-draw relative flex w-fit items-center rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
+                  >
+                    {item.name}
+                  </DrawLineLink>
+                </div>
+              ))}
+            </div>
+            <div className="mobile-nav-item py-6">
+              <Link
+                href="/login"
+                onClick={onClose}
+                className="flex w-full items-center justify-center rounded-full border border-neutral-900/10 bg-neutral-900/4 px-4 py-2.5 text-sm font-medium tracking-tight text-neutral-800 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-md transition-all duration-150 ease-out hover:border-neutral-900/15 hover:bg-neutral-900/7 hover:text-neutral-950 active:scale-[0.97] dark:border-white/12 dark:bg-white/8 dark:text-neutral-200 dark:shadow-[0_1px_2px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.12)] dark:hover:border-white/18 dark:hover:bg-white/12 dark:hover:text-white"
+              >
+                Log in
+              </Link>
+            </div>
+          </div>
+        </div>
+      </DialogPanel>
+    </div>
+  );
+};
+
 const HeroSection8 = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -181,50 +273,9 @@ const HeroSection8 = () => {
           </div>
         </div>
         <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
-          <div className="fixed inset-0 z-50" />
-          <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 dark:bg-gray-900 dark:sm:ring-gray-100/10">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center h-8" onClick={() => setMobileMenuOpen(false)}>
-                <span className="sr-only">Your Company</span>
-                <span className="text-xl font-bold tracking-tight text-neutral-950 dark:text-white leading-none">
-                  {`{Dev/talles}`}
-                </span>
-              </Link>
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center size-8 rounded-md text-gray-700 dark:text-gray-200"
-              >
-                <span className="sr-only">Close menu</span>
-                <XMarkIcon aria-hidden="true" className="size-6" />
-              </button>
-            </div>
-            <div className="mt-6 flow-root">
-              <div className="-my-6 divide-y divide-gray-500/10 dark:divide-white/10">
-                <div className="space-y-2 py-6">
-                  {navigation.map((item) => (
-                    <DrawLineLink
-                      key={item.name}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="text-draw relative flex w-fit items-center rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
-                    >
-                      {item.name}
-                    </DrawLineLink>
-                  ))}
-                </div>
-                <div className="py-6">
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex w-full items-center justify-center rounded-full border border-neutral-900/10 bg-neutral-900/4 px-4 py-2.5 text-sm font-medium tracking-tight text-neutral-800 shadow-[0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-md transition-all duration-150 ease-out hover:border-neutral-900/15 hover:bg-neutral-900/7 hover:text-neutral-950 active:scale-[0.97] dark:border-white/12 dark:bg-white/8 dark:text-neutral-200 dark:shadow-[0_1px_2px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.12)] dark:hover:border-white/18 dark:hover:bg-white/12 dark:hover:text-white"
-                  >
-                    Log in
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </DialogPanel>
+          {mobileMenuOpen && (
+            <MobileMenuContent onClose={() => setMobileMenuOpen(false)} />
+          )}
         </Dialog>
       </header>
 
@@ -297,7 +348,7 @@ const HeroSection8 = () => {
           <MagneticWarp
             // image='https://cdn.cosmos.so/b34094d1-8f3d-4b98-b796-51e0056e6fa0?format=webp'
             // image='https://cdn.cosmos.so/1177f14b-f9f4-4a4a-ad41-d84ade65617a?format=webp'
-            image='https://cdn.cosmos.so/6173519b-0c48-446c-869b-aef38b0fe70e?format=webp'
+            image='https://cdn.cosmos.so/1a03eb2c-d84b-4260-ac44-8e1484a8bda5?format=webp'
             className="aspect-3/2 object-cover lg:aspect-auto lg:size-full"
           />
         </div>
