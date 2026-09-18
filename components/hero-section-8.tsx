@@ -10,6 +10,8 @@ import MagneticWarp from './pixel-perfect/magnetic-warp'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import DrawSVGPlugin from 'gsap/DrawSVGPlugin'
+// import RocketBlast from './ascii/rocket-blast'
+import AnimatedLogo from './AnimatedLogo'
 
 const navigation = [
   { name: 'Productos', href: '#' },
@@ -37,6 +39,7 @@ const decorateSVG = (svgEl: SVGElement) => {
     path.setAttribute('stroke', 'currentColor');
   });
 };
+
 
 interface DrawLineLinkProps {
   href: string;
@@ -175,12 +178,7 @@ const MobileMenuContent = ({ onClose }: MobileMenuContentProps) => {
       />
       <DialogPanel className="mobile-panel fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 dark:bg-gray-900 dark:sm:ring-gray-100/10">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center h-8" onClick={onClose}>
-            <span className="sr-only">Your Company</span>
-            <span className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-white leading-none">
-              {`{Dev/talles}`}
-            </span>
-          </Link>
+          <AnimatedLogo onClick={onClose} srText="DevTalles" />
           <button
             type="button"
             onClick={onClose}
@@ -231,12 +229,7 @@ const HeroSection8 = () => {
           <div className="px-6 pt-6 lg:max-w-2xl lg:pr-0 lg:pl-8">
             <nav aria-label="Global" className="flex items-center justify-between">
               <div className="flex items-center gap-x-8 lg:gap-x-10">
-                <Link href="/" className="flex items-center h-8">
-                  <span className="sr-only">Tu logo :D</span>
-                  <span className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-white leading-none">
-                    {`{Dev/talles}`}
-                  </span>
-                </Link>
+                <AnimatedLogo srText="DevTalles" className="text-2xl font-bold" />
                 <div className="hidden lg:flex lg:items-center lg:gap-x-8">
                   {navigation.map((item) => (
                     <DrawLineLink
@@ -348,9 +341,11 @@ const HeroSection8 = () => {
           <MagneticWarp
             // image='https://cdn.cosmos.so/b34094d1-8f3d-4b98-b796-51e0056e6fa0?format=webp'
             // image='https://cdn.cosmos.so/1177f14b-f9f4-4a4a-ad41-d84ade65617a?format=webp'
-            image='https://cdn.cosmos.so/1a03eb2c-d84b-4260-ac44-8e1484a8bda5?format=webp'
+            image='https://cdn.cosmos.so/fbcbfd35-6bce-4b93-9092-6bb5cf71957f?format=webp'
+            // image='https://cdn.cosmos.so/47cd1771-354b-4e39-9e7a-d578d56589e9?format=webp'
             className="aspect-3/2 object-cover lg:aspect-auto lg:size-full"
           />
+          {/* <RocketBlast  /> */}
         </div>
       </div>
     </div>

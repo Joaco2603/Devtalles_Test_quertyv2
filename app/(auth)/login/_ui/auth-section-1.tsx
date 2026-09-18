@@ -1,25 +1,43 @@
 "use client";
 
 import { GrainGradient } from "@paper-design/shaders-react";
-import { useState, type ReactNode, type FormEvent } from "react";
+import { useState, type ReactNode } from "react";
 import { motion } from "motion/react";
 // import Image from "next/image";
 import Link from "next/link";
+import AnimatedLogo from "@/components/AnimatedLogo";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
+import { loginSchema } from "@/types/login-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from 'next-safe-action/hooks'
+import { loginAction } from "@/server/actions/auth/login-actions";
+import { cn } from "@/lib/utils";
 
 // Apple-inspired spring physics (instant response, critically damped)
 const SPRING_TRANSITION = { type: "spring", damping: 30, stiffness: 350 } as const;
 
 export default function AuthSectionOne() {
-  const [email, setEmail] = useState("harshitlog@gmail.com");
-  const [password, setPassword] = useState("••••••••••••");
   const [showPassword, setShowPassword] = useState(false);
-  // const [rememberMe, setRememberMe] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 800);
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: ""
+    },
+  })
+
+  const { execute, status } = useAction(loginAction, {
+    onSuccess: ({ data }) => {
+      // if(data.ok){
+
+      // }
+    }
+  })
+
+  const handleSubmit = (data: z.infer<typeof loginSchema>) => {
+    execute(data)
   };
 
   return (
@@ -39,11 +57,12 @@ export default function AuthSectionOne() {
           <div className="mx-auto w-full max-w-105 text-center my-auto space-y-5">
             {/* Logo, Editorial Title & Subtitle */}
             <div>
-              <Link href="/" className="flex justify-center">
-                <span
+              {/* <Link href="/" className="flex justify-center"> */}
+              {/* <span
                   className="text-3xl font-bold"
-                >{`{Dev/talles}`}</span>
-              </Link>
+                >{`{Dev/talles}`}</span> */}
+              <AnimatedLogo className="text-3xl font-bold flex justify-center w-fit mx-auto" />
+              {/* </Link> */}
               <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold tracking-[-0.04em] leading-tight text-purple-600 dark:text-white">
                 Bienvenido de nuevo
               </h1>
@@ -68,62 +87,56 @@ export default function AuthSectionOne() {
             </div>
 
             {/* Login Inputs */}
-            <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3">
-              <FieldBox
-                label="Email"
-                type="email"
-                value={email}
-                onChange={setEmail}
-                placeholder="name@company.com"
-                autoComplete="email"
-              />
-
-              <FieldBox
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={setPassword}
-                placeholder="••••••••••••"
-                autoComplete="current-password"
-                trailingAction={
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="shrink-0 text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white transition-colors cursor-pointer"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                  </button>
-                }
-              />
-
-              {/* Remember Me & Forgot Password row */}
-              {/* <div className="flex items-center justify-between pt-0.5 text-xs"> */}
-              {/* <label className="flex items-center gap-2 cursor-pointer select-none text-black/70 dark:text-white/70">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="size-3.5 rounded border-black/20 dark:border-white/20 accent-[#FC7819] cursor-pointer"
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3 sm:space-y-3.5">
+              <Controller
+                control={form.control}
+                name="email"
+                render={({ field: { onChange, value } }) => (
+                  <FieldBox
+                    label="Correo electrónico"
+                    type="email"
+                    value={value}
+                    onChange={onChange}
+                    placeholder="nombre@ejemplo.com"
+                    autoComplete="email"
+                    error={form.formState.errors.email?.message}
                   />
-                  <span>Remember me</span>
-                </label> */}
+                )}
+              />
 
-              {/* <a
-                  href="#"
-                  className="font-medium text-black/60 hover:text-[#FC7819] dark:text-white/60 dark:hover:text-[#FC7819] transition-colors"
-                >
-                  Forgot password?
-                </a> */}
-              {/* </div> */}
+              <Controller
+                control={form.control}
+                name="password"
+                render={({ field: { onChange, value } }) => (
+                  <FieldBox
+                    label="Contraseña"
+                    type={showPassword ? "text" : "password"}
+                    value={value || ""}
+                    onChange={onChange}
+                    placeholder="••••••••••••"
+                    autoComplete="current-password"
+                    error={form.formState.errors.password?.message}
+                    trailingAction={
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="shrink-0 text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white transition-colors cursor-pointer"
+                        aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                      >
+                        {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                      </button>
+                    }
+                  />
+                )}
+              />
 
               {/* Submit CTA (Instant feedback, Apple press physics) */}
               <button
                 type="submit"
-                disabled={isLoading}
-                className="mt-10 flex h-11 sm:h-11.5 w-full items-center justify-center gap-2 rounded-xl bg-purple-600 text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-purple-700 dark:bg-purple-600 dark:text-black dark:hover:bg-purple-400 disabled:opacity-75 cursor-pointer shadow-sm"
+                disabled={status === "executing"}
+                className="mt-6 flex h-11 sm:h-11.5 w-full items-center justify-center gap-2 rounded-xl bg-purple-600 text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-purple-700 dark:bg-purple-600 dark:text-black dark:hover:bg-purple-400 disabled:opacity-75 cursor-pointer shadow-sm"
               >
-                <span>{isLoading ? "Iniciando sesión..." : "Inicia sesión"}</span>
+                <span>{status === "executing" ? "Iniciando sesión..." : "Inicia sesión"}</span>
                 <ArrowRightIcon className="size-4" />
               </button>
             </form>
@@ -164,7 +177,7 @@ export default function AuthSectionOne() {
             frame={2854.5}
             colors={["#FFFFFF", "#FC7819", "#FC7819", "#FFFFFF"]}
             colorBack="#00000000"
-            className="absolute inset-0 bg-black"
+            className="absolute inset-0 bg-blue-400"
           />
 
           {/* Vignette overlay */}
@@ -178,14 +191,14 @@ export default function AuthSectionOne() {
             </div> */}
 
             <h2 className="mt-6 max-w-md text-4xl xl:text-[48px] font-medium tracking-tighter leading-[0.98] text-white">
-              Think fast,
+              Elige tu camino,
               <br />
-              Build faster
+              Empieza a crear
             </h2>
           </div>
 
           {/* Bottom Desktop Download Island */}
-          <div className="relative z-10 flex items-center justify-between gap-3 pt-4">
+          {/* <div className="relative z-10 flex items-center justify-between gap-3 pt-4">
             <div
               className="inline-flex h-10 items-center gap-2.5 rounded-xl border border-white/25 bg-black/30 px-4 text-xs sm:text-sm font-medium text-white/90 backdrop-blur-md transition-all duration-150 ease-out active:scale-[0.98] hover:border-white/50 hover:bg-black/50 hover:text-white"
             >
@@ -199,7 +212,7 @@ export default function AuthSectionOne() {
               <AppleIcon className="size-4 shrink-0" />
               <span className="truncate">macOS</span>
             </div>
-          </div>
+          </div> */}
         </motion.div>
       </div>
     </main>
@@ -230,6 +243,7 @@ function FieldBox({
   placeholder,
   autoComplete,
   trailingAction,
+  error,
 }: {
   label: string;
   value: string;
@@ -238,26 +252,43 @@ function FieldBox({
   placeholder?: string;
   autoComplete?: string;
   trailingAction?: ReactNode;
+  error?: string;
 }) {
+  const id = `login-${label.toLowerCase().replace(/\s+/g, "-")}`;
+
   return (
-    <label className="flex h-11 sm:h-12 items-center justify-between gap-3 rounded-xl border border-black/15 bg-white px-3.5 text-xs sm:text-sm transition-all focus-within:border-black dark:focus-within:border-white focus-within:ring-1 focus-within:ring-black/10 dark:focus-within:ring-white/10 dark:border-white/15 dark:bg-white/5">
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        aria-label={label}
-        autoComplete={autoComplete}
-        className="min-w-0 flex-1 bg-transparent text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/35 text-xs sm:text-sm font-medium"
-      />
-      {trailingAction ? (
-        trailingAction
-      ) : (
-        <span className="shrink-0 text-xs text-black/40 dark:text-white/40 font-medium select-none">
-          {label}
-        </span>
+    <div className="space-y-1 text-left">
+      <label
+        htmlFor={id}
+        className="block text-xs font-medium text-black/70 dark:text-white/70 select-none"
+      >
+        {label}
+      </label>
+      <div
+        className={cn(
+          "flex h-11 sm:h-12 items-center justify-between gap-3 rounded-xl border bg-white px-3.5 text-xs sm:text-sm transition-all dark:bg-white/5",
+          error
+            ? "border-red-500/60 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/20"
+            : "border-black/15 dark:border-white/15 focus-within:border-purple-600 dark:focus-within:border-purple-500 focus-within:ring-1 focus-within:ring-purple-600/20"
+        )}
+      >
+        <input
+          id={id}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          className="min-w-0 flex-1 bg-transparent text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/35 text-xs sm:text-sm font-medium"
+        />
+        {trailingAction}
+      </div>
+      {error && (
+        <p className="text-[11px] text-red-500 font-medium select-none pl-0.5 leading-tight">
+          {error}
+        </p>
       )}
-    </label>
+    </div>
   );
 }
 

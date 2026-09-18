@@ -1,16 +1,23 @@
 "use client";
 
-import { useEffect, useState, type ReactNode, type FormEvent } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
-import Image from "next/image";
 import Link from "next/link";
+import AnimatedLogo from "@/components/AnimatedLogo";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
+import { registerSchema } from "@/types/register-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
+import { registerAction } from "@/server/actions/auth/register-action";
+import { cn } from "@/lib/utils";
 
 const SPRING_TRANSITION = { type: "spring", damping: 30, stiffness: 350 } as const;
 
 const images = [
-  "https://cdn.cosmos.so/429127d5-f72b-4a2b-ab8b-4e0609232462?format=webp",
-  "https://cdn.cosmos.so/1504e886-0e9a-4ed2-a375-228139744a27?format=webp",
+  "https://cdn.cosmos.so/b9e0af40-f4e6-450a-91a6-51294cb76e64?format=webp",
+  "https://cdn.cosmos.so/84c84e48-72f1-465e-9d6b-7bc8dbea845e?format=webp",
   "https://cdn.cosmos.so/80ee8085-596f-43a9-9520-b9579b0f2caf?format=webp",
   "https://cdn.cosmos.so/81e39797-52ea-4284-9fda-0e13f2a9b103?format=webp",
 ];
@@ -22,26 +29,45 @@ const prompts = [
   "Retro 1980s dark fantasy cartoon illustration, cult t-shirt graphic style. Close-up shot of a white duck smoking, the mascot for Camel cigarettes. He is depicted as a cartoon duck with human-like attributes, wearing dark, thick-rimmed sunglasses that reflect a subtle image of palm trees.",
 ];
 
-const formFields = [
-  { label: "First Name", value: "Harshit", type: "text" },
-  { label: "Last Name", value: "Sharma", type: "text" },
-];
 
-const termsText = (
-  <>
-    By creating an account, you agree to our{" "}
-    <a href="#" className="font-medium text-black/60 underline underline-offset-2 hover:text-black dark:text-white/60 dark:hover:text-white">
-      Terms of Service
-    </a>{" "}
-    and{" "}
-    <a href="#" className="font-medium text-black/60 underline underline-offset-2 hover:text-black dark:text-white/60 dark:hover:text-white">
-      Privacy Policy
-    </a>
-  </>
-);
+// const termsText = (
+//   <>
+//     By creating an account, you agree to our{" "}
+//     <a href="#" className="font-medium text-black/60 underline underline-offset-2 hover:text-black dark:text-white/60 dark:hover:text-white">
+//       Terms of Service
+//     </a>{" "}
+//     and{" "}
+//     <a href="#" className="font-medium text-black/60 underline underline-offset-2 hover:text-black dark:text-white/60 dark:hover:text-white">
+//       Privacy Policy
+//     </a>
+//   </>
+// );
 
 export default function AuthSectionTwo() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  const { execute, status } = useAction(registerAction, {
+    onSuccess: ({ data }) => {
+      // if (data?.ok) { ... }
+    },
+  });
+
+  const handleSubmit = (data: z.infer<typeof registerSchema>) => {
+    execute(data);
+  };
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -69,7 +95,7 @@ export default function AuthSectionTwo() {
             {/* Header / Brand */}
             <div className="flex items-center gap-2.5 text-base font-medium text-white select-none">
               {/* <MidjourneyLogo className="size-5" /> */}
-              <span>{`{Dev/spec}`}</span>
+              <AnimatedLogo className="text-xl font-bold flex justify-center w-fit mx-auto text-white mix-blend-difference" />
             </div>
 
             {/* Gapless Bento Image Grid (Strictly sized for viewport fit) */}
@@ -133,11 +159,12 @@ export default function AuthSectionTwo() {
           <div className="mx-auto w-full max-w-105 text-center my-auto">
             {/* Logo, Header */}
             <div>
-              <Link href="/" className="flex justify-center">
-                <span
+              {/* <Link href="/" className="flex justify-center"> */}
+              {/* <span
                   className="text-3xl font-bold"
-                >{`{Dev/talles}`}</span>
-              </Link>
+                >{`{Dev/talles}`}</span> */}
+              <AnimatedLogo className="text-3xl font-bold flex justify-center w-fit mx-auto" />
+              {/* </Link> */}
               <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold tracking-[-0.04em] leading-tight text-purple-600 dark:text-white">
                 Crear una cuenta
               </h1>
@@ -163,32 +190,119 @@ export default function AuthSectionTwo() {
 
             {/* Form */}
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}
-              className="space-y-2 sm:space-y-2.5 text-left"
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-2.5 sm:space-y-3 text-left"
             >
               <div className="grid gap-2 sm:grid-cols-2">
-                {formFields.map((field) => (
-                  <FieldBox key={field.label} label={field.label} value={field.value} type={field.type} />
-                ))}
+                <Controller
+                  control={form.control}
+                  name="firstName"
+                  render={({ field: { onChange, value } }) => (
+                    <FieldBox
+                      label="Nombre"
+                      placeholder="Juan"
+                      value={value}
+                      onChange={onChange}
+                      autoComplete="given-name"
+                      error={form.formState.errors.firstName?.message}
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={form.control}
+                  name="lastName"
+                  render={({ field: { onChange, value } }) => (
+                    <FieldBox
+                      label="Apellido"
+                      placeholder="Pérez"
+                      value={value}
+                      onChange={onChange}
+                      autoComplete="family-name"
+                      error={form.formState.errors.lastName?.message}
+                    />
+                  )}
+                />
               </div>
 
-              <FieldBox label="Email" value="harshitlog@gmail.com" type="email" />
-              <FieldBox label="Password" value="*************" type="password" />
+              <Controller
+                control={form.control}
+                name="email"
+                render={({ field: { onChange, value } }) => (
+                  <FieldBox
+                    label="Correo electrónico"
+                    placeholder="nombre@ejemplo.com"
+                    type="email"
+                    value={value}
+                    onChange={onChange}
+                    autoComplete="email"
+                    error={form.formState.errors.email?.message}
+                  />
+                )}
+              />
 
-              {/* Checkboxes */}
-              {/* <div className="space-y-1.5 pt-1 text-[11px] sm:text-xs leading-4 text-black/50 dark:text-white/50"> */}
-              {/* <CheckboxLine>I don&apos;t want to receive promotional emails about feature updates</CheckboxLine> */}
-              {/* <CheckboxLine>{termsText}</CheckboxLine> */}
-              {/* </div> */}
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Controller
+                  control={form.control}
+                  name="password"
+                  render={({ field: { onChange, value } }) => (
+                    <FieldBox
+                      label="Contraseña"
+                      placeholder="••••••••••••"
+                      type={showPassword ? "text" : "password"}
+                      value={value}
+                      onChange={onChange}
+                      autoComplete="new-password"
+                      error={form.formState.errors.password?.message}
+                      trailingAction={
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="shrink-0 text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white transition-colors cursor-pointer"
+                          aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                        >
+                          {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                        </button>
+                      }
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field: { onChange, value } }) => (
+                    <FieldBox
+                      label="Confirmar contraseña"
+                      placeholder="••••••••••••"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={value}
+                      onChange={onChange}
+                      autoComplete="new-password"
+                      error={form.formState.errors.confirmPassword?.message}
+                      trailingAction={
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="shrink-0 text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white transition-colors cursor-pointer"
+                          aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                        >
+                          {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                        </button>
+                      }
+                    />
+                  )}
+                />
+              </div>
 
               {/* Submit CTA (Instant press physics, Apple-inspired) */}
               <button
                 type="submit"
-                className="mt-10 flex h-10 sm:h-11 w-full items-center justify-center rounded-xl bg-purple-600 text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-purple-700 dark:bg-purple-600 dark:text-black dark:hover:bg-purple-400 cursor-pointer shadow-sm"
+                disabled={status === "executing"}
+                className="mt-6 flex h-10 sm:h-11 w-full items-center justify-center gap-2 rounded-xl bg-purple-600 text-sm sm:text-base font-medium text-white transition-all duration-150 ease-out active:scale-[0.98] hover:bg-purple-700 dark:bg-purple-600 dark:text-black dark:hover:bg-purple-400 disabled:opacity-75 cursor-pointer shadow-sm"
               >
-                Crear Cuenta
+                <span>{status === "executing" ? "Creando cuenta..." : "Crear Cuenta"}</span>
+                <ArrowRight className="size-4" />
               </button>
             </form>
           </div>
@@ -270,36 +384,78 @@ function SocialButton({ icon, label }: { icon: ReactNode; label: string }) {
 
 function FieldBox({
   label,
-  value,
+  value = "",
+  placeholder,
   type = "text",
+  autoComplete,
+  trailingAction,
+  onChange,
+  error,
 }: {
   label: string;
-  value: string;
+  value?: string;
+  placeholder?: string;
   type?: string;
+  autoComplete?: string;
+  trailingAction?: ReactNode;
+  onChange?: (val: string) => void;
+  error?: string;
 }) {
-  const [inputValue, setInputValue] = useState(value);
-  const [isEditing, setIsEditing] = useState(false);
+  const id = `reg-${label.toLowerCase().replace(/\s+/g, "-")}`;
 
   return (
-    <label className="flex h-10 sm:h-10.5 items-center justify-between gap-3 rounded-xl border border-black/15 bg-white px-3 text-xs sm:text-[13px] transition-all focus-within:border-black dark:focus-within:border-white focus-within:ring-1 focus-within:ring-black/10 dark:focus-within:ring-white/10 dark:border-white/15 dark:bg-white/5">
-      <input
-        type={type}
-        value={inputValue}
-        aria-label={label}
-        onFocus={() => {
-          if (!isEditing) {
-            setInputValue("");
-            setIsEditing(true);
-          }
-        }}
-        onChange={(event) => {
-          setInputValue(event.target.value);
-          setIsEditing(true);
-        }}
-        className="min-w-0 flex-1 bg-transparent text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/35 font-medium"
-      />
-      {!isEditing && <span className="shrink-0 text-xs text-black/40 dark:text-white/40 select-none font-medium">{label}</span>}
-    </label>
+    <div className="space-y-1 text-left">
+      <label
+        htmlFor={id}
+        className="block text-xs font-medium text-black/70 dark:text-white/70 select-none"
+      >
+        {label}
+      </label>
+      <div
+        className={cn(
+          "flex h-9.5 sm:h-10 items-center justify-between gap-2.5 rounded-xl border bg-white px-3 text-xs sm:text-[13px] transition-all dark:bg-white/5",
+          error
+            ? "border-red-500/60 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/20"
+            : "border-black/15 dark:border-white/15 focus-within:border-purple-600 dark:focus-within:border-purple-500 focus-within:ring-1 focus-within:ring-purple-600/20"
+        )}
+      >
+        <input
+          id={id}
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          onChange={(event) => onChange?.(event.target.value)}
+          className="min-w-0 flex-1 bg-transparent text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/35 font-medium"
+        />
+        {trailingAction}
+      </div>
+      {error && (
+        <p className="text-[11px] text-red-500 font-medium select-none pl-0.5 leading-tight">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="size-4" aria-hidden="true">
+      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function EyeOffIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="size-4" aria-hidden="true">
+      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+      <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+      <line x1="2" y1="2" x2="22" y2="22" />
+    </svg>
   );
 }
 
