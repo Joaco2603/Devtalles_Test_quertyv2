@@ -164,3 +164,167 @@
   height: 100%;
   overflow: visible !important;
 }
+
+/* =====================================
+   STICKY PILLARS SECTION ANIMATION
+   ===================================== */
+
+.pegajoso {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.sticky-header {
+  position: absolute;
+  top: clamp(2rem, 7vh, 4.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 1.5rem;
+  text-align: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.sticky-header h1 {
+  position: relative;
+  text-align: center;
+  will-change: transform, opacity;
+  transform: translateY(30px);
+  opacity: 0;
+}
+
+.card-container {
+  position: relative;
+  width: 75%;
+  display: flex;
+  perspective: 1000px;
+  transform: translateY(clamp(2.5rem, 5vh, 4rem));
+  will-change: width;
+  z-index: 1;
+}
+
+.card {
+  position: relative;
+  flex: 1;
+  aspect-ratio: 5/7;
+  transform-style: preserve-3d;
+  transform-origin: top;
+}
+
+#card-1 {
+  border-radius: 20px 0 0 20px;
+}
+
+#card-3 {
+  border-radius: 0 20px 20px 0;
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.card-back {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transform: rotateY(180deg);
+  padding: 2rem;
+}
+
+.card-back span {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  opacity: 0.6;
+}
+
+#card-1 .card-back {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(147, 51, 234, 0.24) 0%, transparent 60%),
+    radial-gradient(circle at 15% 90%, rgba(168, 85, 247, 0.12) 0%, transparent 55%),
+    linear-gradient(160deg, rgba(20, 20, 24, 0.97) 0%, rgba(9, 9, 12, 0.99) 100%);
+  color: white;
+}
+
+#card-2 .card-back {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(147, 51, 234, 0.24) 0%, transparent 60%),
+    radial-gradient(circle at 15% 90%, rgba(168, 85, 247, 0.12) 0%, transparent 55%),
+    linear-gradient(160deg, rgba(20, 20, 24, 0.97) 0%, rgba(9, 9, 12, 0.99) 100%);
+  color: white;
+}
+
+#card-3 .card-back {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(147, 51, 234, 0.24) 0%, transparent 60%),
+    radial-gradient(circle at 15% 90%, rgba(168, 85, 247, 0.12) 0%, transparent 55%),
+    linear-gradient(160deg, rgba(20, 20, 24, 0.97) 0%, rgba(9, 9, 12, 0.99) 100%);
+  color: white;
+}
+
+@media (max-width: 1000px) {
+  /* h1 {
+    font-size: 3rem;
+  } */
+
+  /* .intro h1,
+  .outro h1 {
+    width: 100%;
+  } */
+
+  .pegajoso {
+    height: max-content;
+    padding: 4rem 2rem;
+    flex-direction: column;
+  }
+
+  .sticky-header {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    margin-bottom: 3.5rem;
+    padding: 0 1rem;
+    pointer-events: auto;
+  }
+
+  .sticky-header h1 {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .card-container {
+    width: 100% !important;
+    max-width: 420px;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 0;
+    transform: none !important;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: 20px !important;
+  }
+
+  #card-1,
+  #card-2,
+  #card-3,
+  .card-back {
+    transform: none;
+  }
+}
