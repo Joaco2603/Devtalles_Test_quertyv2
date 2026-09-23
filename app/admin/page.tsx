@@ -1,7 +1,9 @@
+import SidebarApp from "./_ui/Sidebar"
+
 export default function AdminPage() {
     return (
-        <div>
+        <SidebarApp>
             <h1>Admin Page</h1>
-        </div>
+        </SidebarApp>
     );
 }
