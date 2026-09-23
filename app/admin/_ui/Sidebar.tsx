@@ -1,11 +1,19 @@
-import React from 'react'
-import { Card, CardContent } from '@/components/ui/card'
+'use client'
+
+import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { getSession } from 'next-auth/react'
+import type { Session } from 'next-auth'
+import { cn } from '@/lib/utils'
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
+    SidebarHeader,
     SidebarMenu,
     SidebarMenuBadge,
     SidebarMenuButton,
@@ -14,144 +22,402 @@ import {
     SidebarTrigger
 } from '@/components/ui/sidebar'
 import { HugeiconsIcon } from "@hugeicons/react"
-import { ChartNoAxesCombinedIcon, ChartLineData01Icon, UserMultiple03Icon, PieChartIcon, HashtagIcon, ArrowLeftRightIcon, Clock9, TaskDaily01Icon, CrownIcon, Activity03Icon, Calendar01Icon, Undo03Icon, SettingsIcon } from "@hugeicons/core-free-icons"
+import {
+    Activity03Icon,
+    ArrowLeftRightIcon,
+    Calendar01Icon,
+    ChartLineData01Icon,
+    ChartNoAxesCombinedIcon,
+    Clock9,
+    CrownIcon,
+    Folder01Icon,
+    HashtagIcon,
+    HelpCircleIcon,
+    Home01Icon,
+    PieChartIcon,
+    SecurityCheckIcon,
+    SettingsIcon,
+    TaskDaily01Icon,
+    Undo03Icon,
+    User02Icon,
+    UserMultiple03Icon,
+} from "@hugeicons/core-free-icons"
+import AnimatedLogo from '@/components/AnimatedLogo'
 
-const SidebarApp = ({ children }: { children: React.ReactNode }) => {
+export type UserRole = 'admin' | 'user' | 'client'
+
+export interface NavItem {
+    title: string
+    href: string
+    icon: React.ComponentProps<typeof HugeiconsIcon>['icon']
+    badge?: string | number
+    badgeColor?: string
+}
+
+export interface NavGroup {
+    label?: string
+    items: NavItem[]
+}
+
+// ==========================================
+// 1. NAVEGACIÓN PARA USUARIO ADMINISTRADOR
+// ==========================================
+export const adminNavGroups: NavGroup[] = [
+    {
+        items: [
+            {
+                title: 'Dashboard General',
+                href: '/admin',
+                icon: ChartNoAxesCombinedIcon,
+                badge: 5,
+                badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold',
+            },
+            // {
+            //     title: 'Monitoreo en Tiempo Real',
+            //     href: '/admin/real-time',
+            //     icon: Activity03Icon,
+            // },
+        ],
+    },
+    {
+        label: 'Gestión y Control',
+        items: [
+            {
+                title: 'Gestión de Usuarios',
+                href: '/admin/users',
+                icon: UserMultiple03Icon,
+                badge: '12',
+                badgeColor: 'bg-primary/10 text-primary font-medium',
+            },
+            {
+                title: 'Roles y Seguridad',
+                href: '/admin/roles',
+                icon: SecurityCheckIcon,
+            },
+            {
+                title: 'Cursos',
+                href: '/admin/cursos',
+                icon: CrownIcon,
+            },
+        ],
+    },
+    {
+        label: 'Analíticas y Rendimiento',
+        items: [
+            {
+                title: 'Content Performance',
+                href: '/admin/content',
+                icon: ChartLineData01Icon,
+            },
+            {
+                title: 'Audience Insight',
+                href: '/admin/audience',
+                icon: UserMultiple03Icon,
+            },
+            {
+                title: 'Engagement Metrics',
+                href: '/admin/engagement',
+                icon: PieChartIcon,
+            },
+            {
+                title: 'Hashtag Performance',
+                href: '/admin/hashtags',
+                icon: HashtagIcon,
+                badge: 3,
+                badgeColor: 'bg-primary/10 text-primary',
+            },
+            {
+                title: 'Competitor Analysis',
+                href: '/admin/competitor',
+                icon: ArrowLeftRightIcon,
+            },
+            {
+                title: 'Sentiment Tracking',
+                href: '/admin/sentiment',
+                icon: TaskDaily01Icon,
+            },
+        ],
+    },
+    {
+        label: 'Sistema y Configuración',
+        items: [
+            {
+                title: 'Calendario Global',
+                href: '/admin/calendar',
+                icon: Calendar01Icon,
+            },
+            {
+                title: 'Reportes y Auditoría',
+                href: '/admin/reports',
+                icon: Undo03Icon,
+            },
+            {
+                title: 'Configuración del Sistema',
+                href: '/admin/settings',
+                icon: SettingsIcon,
+            },
+        ],
+    },
+]
+
+// ==========================================
+// 2. NAVEGACIÓN PARA USUARIO NORMAL / CLIENTE
+// ==========================================
+export const userNavGroups: NavGroup[] = [
+    {
+        items: [
+            {
+                title: 'Mi Dashboard',
+                href: '/admin',
+                icon: Home01Icon,
+            },
+            {
+                title: 'Calendario de Publicaciones',
+                href: '/admin/calendar',
+                icon: Calendar01Icon,
+                badge: 2,
+                badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold',
+            },
+        ],
+    },
+    {
+        label: 'Mi Contenido y Métricas',
+        items: [
+            {
+                title: 'Rendimiento de Contenido',
+                href: '/admin/content',
+                icon: ChartLineData01Icon,
+            },
+            {
+                title: 'Métricas de Interacción',
+                href: '/admin/engagement',
+                icon: PieChartIcon,
+            },
+            {
+                title: 'Hashtags y Tendencias',
+                href: '/admin/hashtags',
+                icon: HashtagIcon,
+            },
+            {
+                title: 'Mis Campañas',
+                href: '/admin/campaigns',
+                icon: Clock9,
+            },
+        ],
+    },
+    {
+        label: 'Herramientas y Cuenta',
+        items: [
+            {
+                title: 'Mis Reportes y Exportes',
+                href: '/admin/reports',
+                icon: Undo03Icon,
+            },
+            {
+                title: 'Mis Archivos',
+                href: '/admin/files',
+                icon: Folder01Icon,
+            },
+            {
+                title: 'Mi Perfil y Cuenta',
+                href: '/admin/profile',
+                icon: User02Icon,
+            },
+            {
+                title: 'Configuración',
+                href: '/admin/settings',
+                icon: SettingsIcon,
+            },
+            {
+                title: 'Centro de Ayuda',
+                href: '/admin/support',
+                icon: HelpCircleIcon,
+            },
+        ],
+    },
+]
+
+export interface SidebarAppProps {
+    children: React.ReactNode
+    role?: UserRole
+}
+
+const SidebarApp = ({
+    children,
+    role,
+}: SidebarAppProps) => {
+    const pathname = usePathname()
+
+    const resolveRole = (r?: string | null): 'admin' | 'user' => {
+        if (!r) return 'admin'
+        const lower = r.toLowerCase()
+        return lower === 'admin' ? 'admin' : 'user'
+    }
+
+    const [sessionUser, setSessionUser] = useState<Session['user'] | null>(null)
+    const [sessionRole, setSessionRole] = useState<'admin' | 'user' | null>(null)
+
+    useEffect(() => {
+        let isMounted = true
+        getSession().then((session) => {
+            if (isMounted && session?.user) {
+                setSessionUser(session.user)
+                if (session.user.role) {
+                    setSessionRole(resolveRole(session.user.role))
+                }
+            }
+        })
+        return () => {
+            isMounted = false
+        }
+    }, [])
+
+    // El rol se obtiene directamente de getSession() (o prop opcional 'role')
+    const currentRole: 'admin' | 'user' = role ? resolveRole(role) : (sessionRole ?? 'admin')
+
+    const activeNavGroups = currentRole === 'admin' ? adminNavGroups : userNavGroups
+
+    const displayName =
+        [sessionUser?.name, sessionUser?.lastname].filter(Boolean).join(' ') ||
+        sessionUser?.name ||
+        (currentRole === 'admin' ? 'Administrador' : 'Usuario Normal')
+
+    const displayEmail =
+        sessionUser?.email ||
+        (currentRole === 'admin' ? 'admin@devtalles.com' : 'usuario@devtalles.com')
+
+    const initials =
+        ((sessionUser?.name?.[0] || '') + (sessionUser?.lastname?.[0] || '')).toUpperCase() ||
+        (currentRole === 'admin' ? 'AD' : 'US')
+
     return (
-        <>
-            <div className='flex min-h-dvh w-full'>
-                <SidebarProvider>
-                    <Sidebar>
-                        <SidebarContent>
-                            <SidebarGroup>
+        <div className='flex min-h-dvh w-full'>
+            <SidebarProvider>
+                <Sidebar>
+                    {/* Header del Sidebar con branding e indicador de rol único */}
+                    <SidebarHeader className='border-sidebar-border border-b p-4'>
+                        <div className='flex items-center justify-between'>
+                            <div className='group flex items-center gap-2.5'>
+                                <div className='flex min-w-0 flex-col'>
+                                    <AnimatedLogo className='text-xl text-black dark:text-white' />
+                                    <span className='text-muted-foreground truncate text-[11px]'>
+                                        {currentRole === 'admin' ? 'Panel Admin' : 'Espacio de Usuario'}
+                                    </span>
+                                </div>
+                            </div>
+                            <span
+                                className={cn(
+                                    'rounded-full px-2 py-0.5 font-semibold text-[10px] uppercase tracking-wider',
+                                    currentRole === 'admin'
+                                        ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
+                                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                )}
+                            >
+                                {currentRole}
+                            </span>
+                        </div>
+                    </SidebarHeader>
+
+                    {/* Contenido de navegación determinado según el rol del usuario */}
+                    <SidebarContent>
+                        {activeNavGroups.map((group, groupIdx) => (
+                            <SidebarGroup key={group.label || `group-${groupIdx}`}>
+                                {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
                                 <SidebarGroupContent>
                                     <SidebarMenu>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={ChartNoAxesCombinedIcon} strokeWidth={2} />
-                                                <span>Dashboard</span>
-                                            </SidebarMenuButton>
-                                            <SidebarMenuBadge className='bg-primary/10 top-1/2! right-2 -translate-y-1/2! rounded-full'>
-                                                5
-                                            </SidebarMenuBadge>
-                                        </SidebarMenuItem>
+                                        {group.items.map((item) => {
+                                            const isActive = pathname === item.href
+                                            return (
+                                                <SidebarMenuItem key={item.title}>
+                                                    <SidebarMenuButton
+                                                        render={<Link href={item.href} />}
+                                                        isActive={isActive}
+                                                        tooltip={item.title}
+                                                    >
+                                                        <HugeiconsIcon icon={item.icon} strokeWidth={2} />
+                                                        <span>{item.title}</span>
+                                                    </SidebarMenuButton>
+                                                    {item.badge !== undefined && (
+                                                        <SidebarMenuBadge
+                                                            className={cn(
+                                                                'top-1/2! right-2 -translate-y-1/2! rounded-full',
+                                                                item.badgeColor || 'bg-primary/10'
+                                                            )}
+                                                        >
+                                                            {item.badge}
+                                                        </SidebarMenuBadge>
+                                                    )}
+                                                </SidebarMenuItem>
+                                            )
+                                        })}
                                     </SidebarMenu>
                                 </SidebarGroupContent>
                             </SidebarGroup>
-                            <SidebarGroup>
-                                <SidebarGroupLabel>Pages</SidebarGroupLabel>
-                                <SidebarGroupContent>
-                                    <SidebarMenu>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={ChartLineData01Icon} strokeWidth={2} />
-                                                <span>Content Performance</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={UserMultiple03Icon} strokeWidth={2} />
-                                                <span>Audience Insight</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={PieChartIcon} strokeWidth={2} />
-                                                <span>Engagement Metrics</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={HashtagIcon} strokeWidth={2} />
-                                                <span>Hashtag Performance</span>
-                                            </SidebarMenuButton>
-                                            <SidebarMenuBadge className='bg-primary/10 top-1/2! right-2 -translate-y-1/2! rounded-full'>
-                                                3
-                                            </SidebarMenuBadge>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={ArrowLeftRightIcon} strokeWidth={2} />
-                                                <span>Competitor Analysis</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={Clock9} strokeWidth={2} />
-                                                <span>Campaign Tracking</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={TaskDaily01Icon} strokeWidth={2} />
-                                                <span>Sentiment Tracking</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={CrownIcon} strokeWidth={2} />
-                                                <span>Influencer</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    </SidebarMenu>
-                                </SidebarGroupContent>
-                            </SidebarGroup>
-                            <SidebarGroup>
-                                <SidebarGroupLabel>Supporting Features</SidebarGroupLabel>
-                                <SidebarGroupContent>
-                                    <SidebarMenu>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={Activity03Icon} strokeWidth={2} />
-                                                <span>Real Time Monitoring</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={Calendar01Icon} strokeWidth={2} />
-                                                <span>Schedule Post & Calendar</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={Undo03Icon} strokeWidth={2} />
-                                                <span>Report & Export</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={SettingsIcon} strokeWidth={2} />
-                                                <span>Settings & Integrations</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                        <SidebarMenuItem>
-                                            <SidebarMenuButton render={<a href='#' />}>
-                                                <HugeiconsIcon icon={UserMultiple03Icon} strokeWidth={2} />
-                                                <span>User Management</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    </SidebarMenu>
-                                </SidebarGroupContent>
-                            </SidebarGroup>
-                        </SidebarContent>
-                    </Sidebar>
-                    <div className='flex flex-1 flex-col'>
-                        <header className='bg-card sticky top-0 z-50 flex h-13.75 items-center justify-between gap-6 border-b px-4 py-2 sm:px-6'>
+                        ))}
+                    </SidebarContent>
+
+                    {/* Footer del Sidebar con perfil de usuario y rol */}
+                    <SidebarFooter className='border-sidebar-border border-t p-3'>
+                        <div className='hover:bg-sidebar-accent/50 flex items-center gap-3 rounded-lg p-2 transition-colors'>
+                            <div
+                                className={cn(
+                                    'flex size-9 shrink-0 items-center justify-center rounded-full font-bold text-xs',
+                                    currentRole === 'admin'
+                                        ? 'bg-purple-600/15 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
+                                        : 'bg-emerald-600/15 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                                )}
+                            >
+                                {initials}
+                            </div>
+                            <div className='flex min-w-0 flex-1 flex-col'>
+                                <span className='text-sidebar-foreground truncate font-semibold text-xs'>
+                                    {displayName}
+                                </span>
+                                <span className='text-muted-foreground truncate text-[11px]'>
+                                    {displayEmail}
+                                </span>
+                            </div>
+                            <Link
+                                href='/'
+                                title='Volver al inicio'
+                                className='text-muted-foreground hover:text-foreground hover:bg-sidebar-accent rounded-md p-1.5 transition-colors'
+                            >
+                                <HugeiconsIcon icon={Home01Icon} strokeWidth={2} className='size-4' />
+                            </Link>
+                        </div>
+                    </SidebarFooter>
+                </Sidebar>
+
+                {/* Estructura principal con barra superior */}
+                <div className='flex flex-1 flex-col'>
+                    <header className='bg-card sticky top-0 z-50 flex h-13.75 items-center justify-between gap-4 border-b px-4 py-2 sm:px-6'>
+                        <div className='flex items-center gap-3'>
                             <SidebarTrigger className='[&_svg]:size-5!' />
-                        </header>
-                        <main className='size-full flex-1 px-4 py-6 sm:px-6'>
-                            {/* <Card className='h-250'> */}
-                            {/* <CardContent className='h-full'> */}
-                            {children}
-                            {/* </CardContent> */}
-                            {/* </Card> */}
-                        </main>
-                        {/* <footer className='bg-card h-10 border-t px-4 sm:px-6'>
-                        </footer> */}
-                    </div>
-                </SidebarProvider>
-            </div>
-        </>
+                            <div className='bg-border hidden h-4 w-px sm:block' />
+                            <div className='flex items-center gap-2'>
+                                <span className='text-foreground font-semibold text-xs sm:text-sm'>
+                                    {currentRole === 'admin' ? 'Panel de Administración' : 'Panel de Usuario'}
+                                </span>
+                                <span
+                                    className={cn(
+                                        'hidden rounded-full px-2 py-0.5 font-medium text-[11px] sm:inline-flex',
+                                        currentRole === 'admin'
+                                            ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
+                                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                    )}
+                                >
+                                    {currentRole === 'admin' ? 'Administrador' : 'Usuario'}
+                                </span>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className='size-full flex-1 px-4 py-6 sm:px-6'>
+                        {children}
+                    </main>
+                </div>
+            </SidebarProvider>
+        </div>
     )
 }
 
