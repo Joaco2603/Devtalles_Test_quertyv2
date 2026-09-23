@@ -12,6 +12,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { registerAction } from "@/server/actions/auth/register-action";
 import { cn } from "@/lib/utils";
+import { toast } from "@/components/ui/toast";
+import { useRouter } from "next/navigation";
 
 const SPRING_TRANSITION = { type: "spring", damping: 30, stiffness: 350 } as const;
 
@@ -47,6 +49,7 @@ export default function AuthSectionTwo() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -61,7 +64,27 @@ export default function AuthSectionTwo() {
 
   const { execute, status } = useAction(registerAction, {
     onSuccess: ({ data }) => {
-      // if (data?.ok) { ... }
+      if (data?.ok) {
+        toast.add({
+          title: 'Register success ✅',
+          description: data.msg,
+          type: 'success',
+        });
+        router.replace('/login');
+      } else {
+        toast.add({
+          title: 'Register error 😢',
+          description: data?.msg || 'Something went wrong',
+          type: 'error',
+        });
+      }
+    },
+    onError: ({ error }) => {
+      toast.add({
+        title: 'Error al registrar 😢',
+        description: 'Ha ocurrido un error al intentar registrar tu cuenta',
+        type: 'error',
+      });
     },
   });
 
