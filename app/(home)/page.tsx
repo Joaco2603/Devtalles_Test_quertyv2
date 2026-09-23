@@ -1,5 +1,6 @@
 import CardsSections from "@/components/CardsSections";
 import HeroSection8 from "@/components/hero-section-8";
+import Hero from "./_ui/hero";
 
 const footerNavigation = {
   main: [
@@ -13,7 +14,7 @@ const footerNavigation = {
 export default function Home() {
   return (
     <div>
-      <HeroSection8 />
+      <Hero />
       <div className="w-full bg-black relative">
         <div className="relative z-20">
           <CardsSections />
