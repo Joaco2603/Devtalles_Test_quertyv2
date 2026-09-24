@@ -256,11 +256,15 @@ export const Navbar = ({ className = '' }: NavbarProps) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [session, setSession] = useState<Session | null>(null);
 
+
+
     useEffect(() => {
         let isMounted = true;
+
         getSession().then((currentSession) => {
             if (isMounted) {
                 setSession(currentSession);
+                console.log(currentSession);
             }
         });
         return () => {

@@ -1,5 +1,5 @@
 import CardsSections from "@/components/CardsSections";
-import HeroSection8 from "@/components/hero-section-8";
+// import HeroSection8 from "@/components/hero-section-8";
 import Hero from "./_ui/hero";
 
 const footerNavigation = {
