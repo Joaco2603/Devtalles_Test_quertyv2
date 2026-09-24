@@ -4,6 +4,7 @@ import { actionClient } from "@/lib/action-client";
 import { signIn } from "@/server/auth";
 import { loginSchema } from "@/types/login-schema";
 
+// Password1!
 export const loginAction = actionClient
     .inputSchema(loginSchema)
     .action(async ({ parsedInput: { email, password } }) => {
@@ -18,7 +19,7 @@ export const loginAction = actionClient
                 body: JSON.stringify({ email: sanitizedEmail, password })
             });
             const data = await user.json();
-            if (!data.ok) {
+            if (!data.data) {
                 return {
                     ok: false,
                     msg: data.msg
@@ -28,7 +29,8 @@ export const loginAction = actionClient
             const usuario = await signIn('credentials', {
                 ...{ email, password },
                 redirect: false
-            })
+            });
+
             return {
                 ok: true,
                 msg: 'Wellcome back',

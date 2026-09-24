@@ -95,6 +95,11 @@ export const adminNavGroups: NavGroup[] = [
                 icon: SecurityCheckIcon,
             },
             {
+                title: 'Categorias',
+                href: '/admin/categorias',
+                icon: Folder01Icon,
+            },
+            {
                 title: 'Cursos',
                 href: '/admin/cursos',
                 icon: CrownIcon,

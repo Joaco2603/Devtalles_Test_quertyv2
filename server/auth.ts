@@ -164,11 +164,11 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
 
                     const userJson = await user.json();
 
-                    if (!userJson.ok) return null;
+                    if (!userJson.data) return null;
                     // console.log(userJson);
                     const usuario = {
                         ...userJson.data.user,
-                        tokenAuth: userJson.data.access_token,
+                        tokenAuth: userJson.data.accessToken,
                     }
                     // if (!userJson.ok || !userJson.password) return null;
                     // if (!userJson.hasOwnProperty("ok")) return null;

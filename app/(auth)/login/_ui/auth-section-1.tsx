@@ -13,12 +13,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from 'next-safe-action/hooks'
 import { loginAction } from "@/server/actions/auth/login-actions";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 // Apple-inspired spring physics (instant response, critically damped)
 const SPRING_TRANSITION = { type: "spring", damping: 30, stiffness: 350 } as const;
 
 export default function AuthSectionOne() {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -30,9 +32,12 @@ export default function AuthSectionOne() {
 
   const { execute, status } = useAction(loginAction, {
     onSuccess: ({ data }) => {
-      // if(data.ok){
-
-      // }
+      if (data) {
+        if (data.ok) {
+          router.push("/");
+          // window.
+        }
+      }
     }
   })
 
