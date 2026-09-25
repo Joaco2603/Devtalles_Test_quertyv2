@@ -24,8 +24,6 @@ export const registerAction = actionClient
             });
             const data = await user.json();
 
-
-
             if (!data.data) {
                 return {
                     ok: false,

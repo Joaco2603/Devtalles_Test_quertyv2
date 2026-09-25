@@ -21,6 +21,7 @@ import {
     Notification01Icon,
     LogoutIcon,
 } from '@hugeicons/core-free-icons'
+import { useRouter } from 'next/navigation'
 
 export interface UserDropdownProps {
     session: Session
@@ -30,6 +31,7 @@ export interface UserDropdownProps {
 
 export const UserDropdown = ({ session, className = '', onItemClick }: UserDropdownProps) => {
     const user = session.user
+    const router = useRouter();
     const fullName = [user?.name, user?.lastname].filter(Boolean).join(' ') || user?.name || user?.email || 'Usuario'
     const initials = (
         (user?.name?.[0] || '') + (user?.lastname?.[0] || user?.name?.[1] || '')
@@ -95,10 +97,10 @@ export const UserDropdown = ({ session, className = '', onItemClick }: UserDropd
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className='*:[svg]:text-muted-foreground cursor-pointer'
-                            onClick={() => onItemClick?.()}
+                            onClick={() => router.push('/admin')}
                         >
                             <HugeiconsIcon icon={CreditCardIcon} strokeWidth={2} />
-                            <span className='text-popover-foreground'>Facturación</span>
+                            <span className='text-popover-foreground'>Panel</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className='*:[svg]:text-muted-foreground cursor-pointer'

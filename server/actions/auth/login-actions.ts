@@ -19,6 +19,7 @@ export const loginAction = actionClient
                 body: JSON.stringify({ email: sanitizedEmail, password })
             });
             const data = await user.json();
+            // console.log(data.data);
             if (!data.data) {
                 return {
                     ok: false,

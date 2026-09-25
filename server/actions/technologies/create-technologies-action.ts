@@ -2,12 +2,11 @@
 
 import { actionClient } from "@/lib/action-client";
 import { auth } from "@/server/auth";
-import { createCategorySchema } from "@/types/categoria-scha";
+import { createTechnologySchema } from "@/types/technology-schema";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 
-export const createCategoryAction = actionClient
-    .inputSchema(createCategorySchema)
+export const createTechnologyAction = actionClient
+    .inputSchema(createTechnologySchema)
     .action(async ({ parsedInput: { name, id } }) => {
         const url = process.env.ADDRESS_SERVER;
         try {
@@ -15,8 +14,8 @@ export const createCategoryAction = actionClient
             if (!session) return { ok: false, msg: 'No tiene permisos para realizar esta operacion' };
             const nameSanitize = name.toLowerCase().trim();
             if (id) {
-                const resp = await fetch(`${url}/api/categories/${id}`, {
-                    method: 'PUT',
+                const resp = await fetch(`${url}/api/technologies/${id}`, {
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${session.user.tokenAuth}`
@@ -27,16 +26,16 @@ export const createCategoryAction = actionClient
                 if (!data.data) {
                     return {
                         ok: false,
-                        msg: 'Error al actualizar la categoría'
-                    }
+                        msg: 'Error al actualizar la tecnología'
+                    };
                 }
-                revalidatePath('/admin/categorias');
+                revalidatePath('/admin/technologies');
                 return {
                     ok: true,
-                    msg: 'Categoría actualizada exitosamente'
-                }
+                    msg: 'Tecnología actualizada exitosamente'
+                };
             }
-            const resp = await fetch(`${url}/api/categories`, {
+            const resp = await fetch(`${url}/api/technologies`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -48,14 +47,15 @@ export const createCategoryAction = actionClient
             if (!data.data) {
                 return {
                     ok: false,
-                    msg: 'Error al crear la categoría'
-                }
+                    msg: 'Error al crear la tecnología'
+                };
             }
+            revalidatePath('/admin/technologies');
             return {
                 ok: true,
-                msg: 'Categoría creada exitosamente'
-            }
-        } catch (e) {
-            return { ok: false, msg: 'Error al crear la categoría' }
+                msg: 'Tecnología creada exitosamente'
+            };
+        } catch {
+            return { ok: false, msg: 'Error al guardar la tecnología' };
         }
     });

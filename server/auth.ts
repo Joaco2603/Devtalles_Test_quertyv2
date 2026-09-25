@@ -163,6 +163,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
                     });
 
                     const userJson = await user.json();
+                    // console.log(userJson.data);
 
                     if (!userJson.data) return null;
                     // console.log(userJson);

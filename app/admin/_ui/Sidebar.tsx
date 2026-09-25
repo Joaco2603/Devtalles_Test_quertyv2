@@ -37,6 +37,7 @@ import {
     PieChartIcon,
     SecurityCheckIcon,
     SettingsIcon,
+    SourceCodeIcon,
     Sparkles,
     TaskDaily01Icon,
     Undo03Icon,
@@ -99,6 +100,11 @@ export const adminNavGroups: NavGroup[] = [
                 title: 'Categorias',
                 href: '/admin/categorias',
                 icon: Folder01Icon,
+            },
+            {
+                title: 'Tecnologías',
+                href: '/admin/technologies',
+                icon: SourceCodeIcon,
             },
             {
                 title: 'Cursos',
