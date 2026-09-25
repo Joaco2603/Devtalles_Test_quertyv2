@@ -111,6 +111,21 @@ export const adminNavGroups: NavGroup[] = [
                 href: '/admin/cursos',
                 icon: CrownIcon,
             },
+            {
+                title: 'Roadmaps',
+                href: '/admin/roadmaps',
+                icon: Sparkles,
+            },
+            {
+                title: 'Cuestionarios',
+                href: '/admin/questionnaires',
+                icon: TaskDaily01Icon,
+            },
+            {
+                title: 'Evaluaciones',
+                href: '/admin/assessments',
+                icon: HelpCircleIcon,
+            },
         ],
     },
     {
@@ -259,9 +274,7 @@ const SidebarApp = ({
     const pathname = usePathname()
 
     const resolveRole = (r?: string | null): 'admin' | 'user' => {
-        if (!r) return 'admin'
-        const lower = r.toLowerCase()
-        return lower === 'admin' ? 'admin' : 'user'
+        return r?.toLowerCase() === 'admin' ? 'admin' : 'user'
     }
 
     const [sessionUser, setSessionUser] = useState<Session['user'] | null>(null)
@@ -283,7 +296,7 @@ const SidebarApp = ({
     }, [])
 
     // El rol se obtiene directamente de getSession() (o prop opcional 'role')
-    const currentRole: 'admin' | 'user' = role ? resolveRole(role) : (sessionRole ?? 'admin')
+    const currentRole: 'admin' | 'user' = role ? resolveRole(role) : (sessionRole ?? 'user')
 
     const activeNavGroups = currentRole === 'admin' ? adminNavGroups : userNavGroups
 

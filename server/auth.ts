@@ -29,6 +29,9 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
             if (user) {
                 token.tokenAuth = usuario.tokenAuth;
                 token.role = usuario.role;
+                if (usuario.name) token.name = usuario.name;
+                if (usuario.email) token.email = usuario.email;
+                if (usuario.lastname) token.lastname = usuario.lastname;
             }
 
             if (account && account.provider === 'discord') {
@@ -144,8 +147,33 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
             credentials: {
                 email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" },
+                discordTicket: { label: "Discord ticket", type: "text" },
             },
             authorize: async (credentials) => {
+                const discordTicket = credentials?.discordTicket;
+                if (typeof discordTicket === 'string' && discordTicket.length > 0) {
+                    const exchanged = await fetch(`${process.env.ADDRESS_SERVER}/api/auth/discord/exchange`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ code: discordTicket }),
+                    });
+                    const exchangedJson = await exchanged.json();
+                    const session = exchangedJson.data;
+                    if (!session?.accessToken || !session?.user) return null;
+
+                    return {
+                        id: session.user.id,
+                        name: session.user.firstName,
+                        lastname: session.user.lastName ?? '',
+                        email: session.user.email,
+                        role: session.user.role,
+                        image: null,
+                        tokenAuth: session.accessToken,
+                    };
+                }
+
                 const validatedFields = loginSchema.safeParse(credentials);
                 if (validatedFields.success) {
 

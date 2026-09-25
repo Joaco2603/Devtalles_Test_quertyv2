@@ -13,9 +13,9 @@ import type { Session } from 'next-auth'
 import UserDropdown from './dropdown'
 
 export const navigation = [
-    { name: 'Mi perfil', href: '#' },
-    { name: 'Features', href: '#' },
-    { name: 'Marketplace', href: '#' },
+    { name: 'Mi perfil', href: '/login' },
+    { name: 'Features', href: '/#features' },
+    { name: 'Marketplace', href: '/admin/cursos' },
 ]
 
 const svgVariants = [

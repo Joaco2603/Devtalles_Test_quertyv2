@@ -12,6 +12,7 @@ import { loginSchema } from "@/types/login-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from 'next-safe-action/hooks'
 import { loginAction } from "@/server/actions/auth/login-actions";
+import { discordLoginAction } from "@/server/actions/auth/discord-action";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
@@ -54,7 +55,7 @@ export default function AuthSectionOne() {
             LEFT CARD: COMPACT LOGIN FORM
            ========================================================================= */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={SPRING_TRANSITION}
           className="flex h-full flex-col justify-between rounded-2xl sm:rounded-3xl border border-black/10 bg-white px-6 py-10 sm:px-8 sm:py-12 lg:px-9 lg:py-14 dark:border-white/10 dark:bg-[#0a0a0a] shadow-sm dark:shadow-2xl overflow-y-auto"
@@ -77,9 +78,9 @@ export default function AuthSectionOne() {
             </div>
 
             {/* Social Logins */}
-            <div className="mt-4 sm:mt-5">
-              <SocialButton icon={<DiscordIcon />} label="Iniciar sesión con Discord" />
-            </div>
+            <form action={discordLoginAction} className="mt-4 sm:mt-5">
+              <SocialButton type="submit" icon={<DiscordIcon />} label="Iniciar sesión con Discord" />
+            </form>
 
             {/* Minimalist Divider */}
             <div className="relative my-3.5 sm:my-4 flex items-center justify-center">
@@ -163,7 +164,7 @@ export default function AuthSectionOne() {
             RIGHT CARD: CINEMATIC GRAIN SHADER & PROMO
            ========================================================================= */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.99 }}
+          initial={false}
           animate={{ opacity: 1, scale: 1 }}
           transition={SPRING_TRANSITION}
           className="relative hidden lg:flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl bg-black p-7 xl:p-9 text-white shadow-2xl h-full"
@@ -228,10 +229,10 @@ export default function AuthSectionOne() {
 // SUB-COMPONENTS
 // =============================================================================
 
-function SocialButton({ icon, label }: { icon: ReactNode; label: string }) {
+function SocialButton({ icon, label, type = "button" }: { icon: ReactNode; label: string; type?: "button" | "submit" }) {
   return (
     <button
-      type="button"
+      type={type}
       className="flex h-10 w-full items-center justify-center gap-2.5 rounded-xl border border-black/15 bg-white px-3 text-xs sm:text-[13px] font-medium text-black transition-all duration-150 ease-out active:scale-[0.98] hover:bg-black/4 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 cursor-pointer"
     >
       <span className="shrink-0">{icon}</span>
