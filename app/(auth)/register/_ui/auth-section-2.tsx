@@ -318,6 +318,11 @@ export default function AuthSectionTwo() {
                   )}
                 />
               </div>
+              {!form.formState.errors.password ? (
+                <p className="text-[11px] leading-snug text-black/45 dark:text-white/45">
+                  Mayúscula, minúscula y un número o carácter especial. Entre 8 y 20 caracteres.
+                </p>
+              ) : null}
 
               {/* Submit CTA (Instant press physics, Apple-inspired) */}
               <button
