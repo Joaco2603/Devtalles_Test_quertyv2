@@ -58,12 +58,34 @@ export interface RoadmapCourseView {
     course?: RoadmapCatalogCourse | null;
 }
 
+export const ROADMAP_SCOPES = ["personal", "global"] as const;
+export type RoadmapScope = (typeof ROADMAP_SCOPES)[number];
+
+export const ROADMAP_SCOPE_LABELS: Record<RoadmapScope, string> = {
+    personal: "Personal",
+    global: "Global",
+};
+
 /** Roadmap view returned directly by Nest (not wrapped in { data }). */
 export interface RoadmapView {
     id: number;
     title: string;
+    scope: RoadmapScope;
     userId: string;
+    sourceRoadmapId?: number | null;
+    rationale?: string | null;
+    assessmentId?: number | null;
     courses: RoadmapCourseView[];
+}
+
+export function savedCopiesByGlobalId(roadmaps: RoadmapView[]): Record<number, number> {
+    const saved: Record<number, number> = {};
+    for (const roadmap of roadmaps) {
+        if (roadmap.sourceRoadmapId != null) {
+            saved[roadmap.sourceRoadmapId] = roadmap.id;
+        }
+    }
+    return saved;
 }
 
 /** Minimal course option for the published catalog picker. */

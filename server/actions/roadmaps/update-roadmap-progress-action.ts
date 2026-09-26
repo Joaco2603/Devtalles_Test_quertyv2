@@ -45,6 +45,8 @@ export const updateRoadmapProgressAction = async (
         }
 
         revalidatePath("/admin/roadmaps");
+        revalidatePath("/panel/roadmaps");
+        revalidatePath("/roadmaps");
         return {
             ok: true as const,
             data: body as RoadmapView,

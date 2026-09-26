@@ -31,18 +31,24 @@ export default function AuthSectionOne() {
     },
   })
 
+  const [formError, setFormError] = useState<string | null>(null);
+
   const { execute, status } = useAction(loginAction, {
     onSuccess: ({ data }) => {
-      if (data) {
-        if (data.ok) {
-          router.push("/");
-          // window.
-        }
+      if (data?.ok) {
+        setFormError(null);
+        router.push("/");
+        return;
       }
-    }
+      setFormError(data?.msg ?? "No se pudo iniciar sesión. Intenta de nuevo.");
+    },
+    onError: () => {
+      setFormError("No se pudo iniciar sesión. Intenta de nuevo.");
+    },
   })
 
   const handleSubmit = (data: z.infer<typeof loginSchema>) => {
+    setFormError(null);
     execute(data)
   };
 
@@ -135,6 +141,12 @@ export default function AuthSectionOne() {
                   />
                 )}
               />
+
+              {formError && (
+                <p role="alert" className="text-left text-[11px] font-medium text-red-500 select-none">
+                  {formError}
+                </p>
+              )}
 
               {/* Submit CTA (Instant feedback, Apple press physics) */}
               <button

@@ -18,6 +18,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import {
     Route01Icon,
     Search01Icon,
+    Sparkles,
     PlusSignIcon,
     PencilEdit02Icon,
     ArrowUpDownIcon,
@@ -38,16 +39,37 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import type { RoadmapView } from '@/types/roadmap-schema';
+import {
+    ROADMAP_SCOPE_LABELS,
+    type RoadmapView,
+} from '@/types/roadmap-schema';
+import AddToMyRoadmapsButton from './AddToMyRoadmapsButton';
 
 interface RoadmapsTableProps {
     initialRoadmaps: RoadmapView[];
     errorMessage?: string;
+    title?: string;
+    description?: string;
+    detailBasePath?: string;
+    createHref?: string | null;
+    /** Sends the student to questionnaires so AI builds a personal route. */
+    personalizeHref?: string | null;
+    /** When set, each global row can be copied into the student's personal list. */
+    saveToMine?: {
+        mineBasePath: string;
+        savedByGlobalId: Record<number, number>;
+    };
 }
 
 export default function RoadmapsTable({
     initialRoadmaps,
     errorMessage,
+    title = 'Roadmaps',
+    description = 'Roadmaps globales del catálogo. Cada alumno guarda el suyo como personal; aquí ves los que aplican a todos.',
+    detailBasePath = '/admin/roadmaps',
+    createHref = '/admin/roadmaps/new',
+    personalizeHref = null,
+    saveToMine,
 }: RoadmapsTableProps) {
     const [roadmaps, setRoadmaps] = useState<RoadmapView[]>(initialRoadmaps);
     const [sorting, setSorting] = useState<SortingState>([{ id: 'title', desc: false }]);
@@ -91,7 +113,7 @@ export default function RoadmapsTable({
                         </div>
                         <div className="flex min-w-0 flex-col">
                             <Link
-                                href={`/admin/roadmaps/${row.original.id}`}
+                                href={`${detailBasePath}/${row.original.id}`}
                                 className="truncate text-sm font-semibold tracking-tight text-foreground transition-colors hover:text-purple-600 dark:hover:text-purple-400"
                             >
                                 {row.original.title}
@@ -102,6 +124,29 @@ export default function RoadmapsTable({
                         </div>
                     </div>
                 ),
+            },
+            {
+                accessorKey: 'scope',
+                header: () => (
+                    <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Alcance
+                    </div>
+                ),
+                cell: ({ row }) => {
+                    const global = row.original.scope === 'global';
+                    return (
+                        <span
+                            className={cn(
+                                'inline-flex items-center rounded-lg border px-2.5 py-1 text-xs font-semibold',
+                                global
+                                    ? 'border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300'
+                                    : 'border-border/60 bg-muted/40 text-foreground'
+                            )}
+                        >
+                            {ROADMAP_SCOPE_LABELS[row.original.scope] ?? row.original.scope}
+                        </span>
+                    );
+                },
             },
             {
                 id: 'courseCount',
@@ -126,8 +171,16 @@ export default function RoadmapsTable({
                 ),
                 cell: ({ row }) => (
                     <div className="flex items-center justify-end gap-2 pr-2">
+                        {saveToMine && row.original.scope === 'global' && (
+                            <AddToMyRoadmapsButton
+                                globalId={row.original.id}
+                                savedRoadmapId={saveToMine.savedByGlobalId[row.original.id]}
+                                mineBasePath={saveToMine.mineBasePath}
+                                compact
+                            />
+                        )}
                         <Link
-                            href={`/admin/roadmaps/${row.original.id}`}
+                            href={`${detailBasePath}/${row.original.id}`}
                             className="group inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-background/60 px-3.5 py-1.5 text-xs font-medium text-foreground transition-all duration-200 hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-600 active:scale-[0.97] dark:hover:text-purple-400"
                         >
                             <HugeiconsIcon
@@ -142,7 +195,7 @@ export default function RoadmapsTable({
                 enableSorting: false,
             },
         ],
-        []
+        [detailBasePath, saveToMine]
     );
 
     const table = useReactTable({
@@ -171,24 +224,49 @@ export default function RoadmapsTable({
             >
                 <div className="space-y-2">
                     <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-                        Roadmaps
+                        {title}
                     </h1>
                     <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                        Tus rutas de aprendizaje. Consulta, crea y edita roadmaps
-                        con secuencia de cursos y progreso.
+                        {description}
                     </p>
                 </div>
 
+                {createHref && (
+                    <Link
+                        href={createHref}
+                        className="group relative inline-flex shrink-0 items-center justify-between gap-3.5 rounded-full bg-purple-600 py-2.5 pr-2.5 pl-6 text-sm font-semibold text-white shadow-xl shadow-purple-600/25 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-purple-500 hover:shadow-purple-500/40 active:scale-[0.98]"
+                    >
+                        <span>Nuevo roadmap</span>
+                        <span className="flex size-7 items-center justify-center rounded-full bg-white/20 text-white transition-transform duration-300 group-hover:scale-110 group-hover:translate-x-0.5">
+                            <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.5} className="size-3.5" />
+                        </span>
+                    </Link>
+                )}
+            </motion.div>
+
+            {personalizeHref && (
                 <Link
-                    href="/admin/roadmaps/new"
-                    className="group relative inline-flex shrink-0 items-center justify-between gap-3.5 rounded-full bg-purple-600 py-2.5 pr-2.5 pl-6 text-sm font-semibold text-white shadow-xl shadow-purple-600/25 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-purple-500 hover:shadow-purple-500/40 active:scale-[0.98]"
+                    href={personalizeHref}
+                    className="group flex flex-col gap-4 rounded-[1.6rem] border border-purple-500/30 bg-purple-500/10 p-5 transition-all hover:border-purple-500/50 hover:bg-purple-500/15 sm:flex-row sm:items-center sm:justify-between"
                 >
-                    <span>Nuevo roadmap</span>
-                    <span className="flex size-7 items-center justify-center rounded-full bg-white/20 text-white transition-transform duration-300 group-hover:scale-110 group-hover:translate-x-0.5">
-                        <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.5} className="size-3.5" />
+                    <div className="flex items-start gap-3">
+                        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-purple-600 text-white">
+                            <HugeiconsIcon icon={Sparkles} strokeWidth={2} className="size-5" />
+                        </span>
+                        <div>
+                            <p className="text-sm font-semibold text-foreground">
+                                ¿Quieres una ruta a tu medida?
+                            </p>
+                            <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+                                Responde un cuestionario y armamos tu roadmap con IA.
+                            </p>
+                        </div>
+                    </div>
+                    <span className="inline-flex shrink-0 items-center justify-center rounded-full bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-purple-500">
+                        Ir a cuestionarios
                     </span>
                 </Link>
-            </motion.div>
+            )}
 
             {errorMessage && (
                 <div className="flex items-start gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -285,16 +363,31 @@ export default function RoadmapsTable({
                                                     <p className="max-w-sm text-xs text-muted-foreground">
                                                         {searchFilterValue
                                                             ? `Ningún roadmap coincide con "${searchFilterValue}".`
-                                                            : 'Crea el primer roadmap para organizar una ruta de cursos.'}
+                                                            : createHref && personalizeHref
+                                                              ? 'Crea una ruta eligiendo los cursos, o responde un cuestionario y la armamos con IA.'
+                                                              : createHref
+                                                                ? 'Crea el primer roadmap para organizar una ruta de cursos.'
+                                                                : personalizeHref
+                                                                  ? 'Responde un cuestionario y armamos tu primera ruta con IA.'
+                                                                  : 'Cuando haya rutas en esta sección, aparecerán aquí.'}
                                                     </p>
                                                 </div>
-                                                {!searchFilterValue && (
+                                                {!searchFilterValue && createHref && (
                                                     <Link
-                                                        href="/admin/roadmaps/new"
+                                                        href={createHref}
                                                         className="mt-2 inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-xs font-semibold text-white shadow-md shadow-purple-600/20 transition-all hover:bg-purple-500 active:scale-[0.98]"
                                                     >
                                                         <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} className="size-3.5" />
                                                         <span>Crear primer roadmap</span>
+                                                    </Link>
+                                                )}
+                                                {!searchFilterValue && !createHref && personalizeHref && (
+                                                    <Link
+                                                        href={personalizeHref}
+                                                        className="mt-2 inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-xs font-semibold text-white shadow-md shadow-purple-600/20 transition-all hover:bg-purple-500 active:scale-[0.98]"
+                                                    >
+                                                        <HugeiconsIcon icon={Sparkles} strokeWidth={2} className="size-3.5" />
+                                                        <span>Ir a cuestionarios</span>
                                                     </Link>
                                                 )}
                                             </div>

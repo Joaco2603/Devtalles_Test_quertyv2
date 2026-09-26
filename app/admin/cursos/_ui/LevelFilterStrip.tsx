@@ -26,8 +26,8 @@ export default function LevelFilterStrip({
     ];
 
     return (
-        <div className="flex flex-wrap items-center gap-2">
-            <span className="mr-1 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="-mx-1 flex min-w-0 w-full items-center gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
+            <span className="mr-1 inline-flex shrink-0 items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 <HugeiconsIcon
                     icon={SignalFull01Icon}
                     strokeWidth={2}

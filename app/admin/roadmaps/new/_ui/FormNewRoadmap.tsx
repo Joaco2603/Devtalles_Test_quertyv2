@@ -26,9 +26,13 @@ import CourseOrderPicker from '../../_ui/CourseOrderPicker';
 
 interface FormNewRoadmapProps {
     catalog: PublishedCourseOption[];
+    returnHref?: string;
 }
 
-export default function FormNewRoadmap({ catalog }: FormNewRoadmapProps) {
+export default function FormNewRoadmap({
+    catalog,
+    returnHref = '/admin/roadmaps',
+}: FormNewRoadmapProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
@@ -65,7 +69,7 @@ export default function FormNewRoadmap({ catalog }: FormNewRoadmapProps) {
                 description: result.msg,
                 type: 'success',
             });
-            router.push('/admin/roadmaps');
+            router.push(returnHref);
             router.refresh();
         });
     };
@@ -80,7 +84,7 @@ export default function FormNewRoadmap({ catalog }: FormNewRoadmapProps) {
             >
                 <div className="flex items-center gap-2">
                     <Link
-                        href="/admin/roadmaps"
+                        href={returnHref}
                         className="group inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-background/50 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-border hover:bg-accent hover:text-foreground active:scale-[0.98]"
                     >
                         <HugeiconsIcon
@@ -179,7 +183,7 @@ export default function FormNewRoadmap({ catalog }: FormNewRoadmapProps) {
 
                     <div className="flex flex-col-reverse gap-3 pt-3 sm:flex-row sm:items-center sm:justify-end">
                         <Link
-                            href="/admin/roadmaps"
+                            href={returnHref}
                             className="inline-flex h-11 items-center justify-center rounded-xl border border-border/80 bg-background/50 px-5 text-sm font-medium text-foreground transition-all hover:border-border hover:bg-muted active:scale-[0.98]"
                         >
                             Cancelar

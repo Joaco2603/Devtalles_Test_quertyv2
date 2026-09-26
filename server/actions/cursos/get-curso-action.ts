@@ -24,6 +24,7 @@ export const getCursoAction = async (id: number) => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${session.user.tokenAuth}`,
             },
+            cache: "no-store",
         });
         const body = await resp.json();
 

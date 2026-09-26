@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -11,7 +11,6 @@ import {
   ArrowRight01Icon,
   Tick02Icon,
   Delete02Icon,
-  FloppyDiskIcon,
   CheckmarkCircle02Icon,
   Alert02Icon,
 } from "@hugeicons/core-free-icons";
@@ -29,6 +28,7 @@ import { getAssessmentQuestionnaireAction } from "@/server/actions/assessments/g
 import { upsertAssessmentAnswerAction } from "@/server/actions/assessments/upsert-assessment-answer-action";
 import { deleteAssessmentAnswerAction } from "@/server/actions/assessments/delete-assessment-answer-action";
 import { completeAssessmentAction } from "@/server/actions/assessments/complete-assessment-action";
+import { generateRoadmapAction } from "@/server/actions/roadmaps/generate-roadmap-action";
 import {
   buildUpsertPayload,
   isAssessmentCompleted,
@@ -84,6 +84,15 @@ function answerSummary(question: Question, answer?: AssessmentAnswer): string {
   return String(answer.value);
 }
 
+function isSameAnswer(a: AssessmentAnswer, b: AssessmentAnswer): boolean {
+  const ids = (value?: number[]) => [...(value ?? [])].sort((x, y) => x - y).join(",");
+  return (
+    a.answerOptionId === b.answerOptionId &&
+    ids(a.answerOptionIds) === ids(b.answerOptionIds) &&
+    a.value === b.value
+  );
+}
+
 function isDraftFilled(question: Question, draft: AssessmentAnswer): boolean {
   if (question.type === "single_choice") return draft.answerOptionId != null;
   if (question.type === "multiple_choice")
@@ -97,8 +106,13 @@ function isDraftFilled(question: Question, draft: AssessmentAnswer): boolean {
   return false;
 }
 
-export default function AssessmentDetail() {
+export default function AssessmentDetail({
+  backHref = "/admin/assessments",
+}: {
+  backHref?: string;
+}) {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const id = Number(params.id);
 
   const [assessment, setAssessment] = useState<Assessment | null>(null);
@@ -109,8 +123,10 @@ export default function AssessmentDetail() {
   const [missing, setMissing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [step, setStep] = useState(0);
+  const [maxReached, setMaxReached] = useState(0);
   const [draft, setDraft] = useState<AssessmentAnswer>(emptyDraft(0));
   const [busy, setBusy] = useState(false);
+  const resumed = useRef(false);
 
   const applyAssessment = useCallback(
     (next: Assessment, qs: Questionnaire) => {
@@ -177,9 +193,23 @@ export default function AssessmentDetail() {
   useEffect(() => {
     if (questions.length === 0) return;
     if (step > questions.length - 1) {
-      setStep(Math.max(0, questions.length - 1));
+      const next = Math.max(0, questions.length - 1);
+      setStep(next);
+      setMaxReached((reached) => Math.min(reached, next));
     }
   }, [questions.length, step]);
+
+  useEffect(() => {
+    if (resumed.current || questions.length === 0) return;
+    resumed.current = true;
+    const firstOpen = questions.findIndex((q) => {
+      const saved = getAnswer(answers, q.id);
+      return !saved || !isDraftFilled(q, saved);
+    });
+    const start = firstOpen === -1 ? questions.length - 1 : firstOpen;
+    setStep(start);
+    setMaxReached(start);
+  }, [answers, questions]);
 
   const answeredCount = useMemo(() => {
     return questions.filter((q) => {
@@ -215,7 +245,7 @@ export default function AssessmentDetail() {
           Este intento no existe o no tienes acceso.
         </p>
         <Link
-          href="/admin/assessments"
+          href={backHref}
           className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold text-white hover:bg-purple-500"
         >
           Volver al listado
@@ -263,7 +293,7 @@ export default function AssessmentDetail() {
           Este cuestionario no tiene preguntas aplicables por ahora.
         </p>
         <Link
-          href="/admin/assessments"
+          href={backHref}
           className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold text-white hover:bg-purple-500"
         >
           Volver al listado
@@ -281,24 +311,34 @@ export default function AssessmentDetail() {
   }
 
   const important = isMostImportantQuestion(current, questions);
+  const isLast = step >= questions.length - 1;
+  const mayAddQuestions =
+    isLast &&
+    current.type === "multiple_choice" &&
+    (draft.answerOptionIds?.length ?? 0) > 0;
+  const primaryLabel = !isLast || mayAddQuestions ? "Seguir" : "Finalizar";
 
-  const saveAnswer = async () => {
-    if (completed || busy) return;
-    if (!isDraftFilled(current, draft)) {
+  const persistCurrent = async (): Promise<{
+    questions: Question[];
+    questionnaire: Questionnaire;
+  } | null> => {
+    const filled = isDraftFilled(current, draft);
+    const optional = current.rules?.required === false;
+
+    if (!filled) {
+      if (optional) return { questions, questionnaire };
       toast.add({
         title: "Respuesta incompleta",
-        description: "Selecciona o escribe una respuesta antes de guardar.",
+        description: "Selecciona o escribe una respuesta antes de seguir.",
         type: "error",
       });
-      return;
+      return null;
     }
 
-    setBusy(true);
     const res = await upsertAssessmentAnswerAction(
       assessment.id,
       buildUpsertPayload(current, draft)
     );
-    setBusy(false);
 
     if (!res.ok) {
       toast.add({
@@ -306,13 +346,88 @@ export default function AssessmentDetail() {
         description: res.msg,
         type: "error",
       });
+      return null;
+    }
+
+    const qRes = await getAssessmentQuestionnaireAction(assessment.id);
+    if (!qRes.ok) {
+      applyAssessment(res.data, questionnaire);
+      toast.add({
+        title: "Respuesta actualizada",
+        description: qRes.msg,
+        type: "error",
+      });
+      return { questions, questionnaire };
+    }
+
+    applyAssessment(res.data, qRes.data);
+    return {
+      questionnaire: qRes.data,
+      questions: [...qRes.data.questions].sort(
+        (a, b) => a.sortOrder - b.sortOrder || a.id - b.id
+      ),
+    };
+  };
+
+  const leaveCurrent = async (): Promise<boolean> => {
+    const saved = getAnswer(answers, current.id);
+    if (!isDraftFilled(current, draft)) return true;
+    if (saved && isSameAnswer(saved, draft)) return true;
+
+    setBusy(true);
+    const persisted = await persistCurrent();
+    setBusy(false);
+    return persisted != null;
+  };
+
+  const goBack = async () => {
+    if (busy || step === 0) return;
+    const ok = await leaveCurrent();
+    if (!ok) return;
+    setStep((currentStep) => Math.max(0, currentStep - 1));
+  };
+
+  const goTo = async (index: number) => {
+    if (busy || index === step || index > maxReached) return;
+    const ok = await leaveCurrent();
+    if (!ok) return;
+    setStep(index);
+  };
+
+  const follow = async () => {
+    if (completed || busy) return;
+
+    setBusy(true);
+    const saved = await persistCurrent();
+    if (!saved) {
+      setBusy(false);
       return;
     }
 
-    await refreshQuestionnaire(res.data);
+    if (step < saved.questions.length - 1) {
+      const next = step + 1;
+      setStep(next);
+      setMaxReached((reached) => Math.max(reached, next));
+      setBusy(false);
+      return;
+    }
+
+    const res = await completeAssessmentAction(assessment.id);
+    setBusy(false);
+
+    if (!res.ok) {
+      toast.add({
+        title: "No se pudo completar",
+        description: res.msg,
+        type: "error",
+      });
+      return;
+    }
+
+    applyAssessment(res.data, saved.questionnaire);
     toast.add({
-      title: "Respuesta guardada",
-      description: `Se guardó la respuesta a la pregunta ${step + 1}.`,
+      title: "Evaluación completada",
+      description: "El intento quedó marcado como completado.",
       type: "success",
     });
   };
@@ -342,28 +457,28 @@ export default function AssessmentDetail() {
     });
   };
 
-  const completeAssessment = async () => {
-    if (completed || busy) return;
+  const generateRoadmap = async () => {
+    if (!assessment || busy) return;
 
     setBusy(true);
-    const res = await completeAssessmentAction(assessment.id);
+    const res = await generateRoadmapAction(assessment.id);
     setBusy(false);
 
     if (!res.ok) {
       toast.add({
-        title: "No se pudo completar",
+        title: "No se pudo armar la ruta",
         description: res.msg,
         type: "error",
       });
       return;
     }
 
-    applyAssessment(res.data, questionnaire);
     toast.add({
-      title: "Evaluación completada",
-      description: "El intento quedó marcado como completado.",
+      title: "Hemos seleccionado los mejores cursos para ti",
+      description: res.data.rationale ?? res.data.title,
       type: "success",
     });
+    router.push(`/admin/roadmaps/${res.data.id}`);
   };
 
   return (
@@ -375,7 +490,7 @@ export default function AssessmentDetail() {
         className="space-y-4"
       >
         <Link
-          href="/admin/assessments"
+          href={backHref}
           className="group inline-flex w-fit items-center gap-1.5 rounded-lg border border-border/60 bg-background/50 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-border hover:bg-accent hover:text-foreground active:scale-[0.98]"
         >
           <HugeiconsIcon
@@ -383,7 +498,7 @@ export default function AssessmentDetail() {
             strokeWidth={2}
             className="size-3.5 transition-transform group-hover:-translate-x-0.5"
           />
-          Evaluaciones
+          Cuestionarios
         </Link>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -481,6 +596,16 @@ export default function AssessmentDetail() {
               );
             })}
           </ul>
+          {questionnaire.title === "Tu ruta personal" && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void generateRoadmap()}
+              className="w-full rounded-2xl bg-purple-600 py-3 text-sm font-semibold text-white shadow-md shadow-purple-600/20 transition-all hover:bg-purple-500 active:scale-[0.99] disabled:opacity-60"
+            >
+              Armar mi ruta personal
+            </button>
+          )}
         </motion.div>
       ) : (
         <motion.div
@@ -502,17 +627,24 @@ export default function AssessmentDetail() {
                 <button
                   key={q.id}
                   type="button"
-                  onClick={() => setStep(i)}
+                  disabled={i > maxReached || busy}
+                  onClick={() => void goTo(i)}
                   className={cn(
                     "size-8 rounded-lg text-xs font-bold transition-all",
                     i === step
                       ? "bg-purple-600 text-white shadow-md shadow-purple-600/25"
                       : answered
                         ? "bg-purple-500/15 text-purple-700 dark:text-purple-300"
-                        : "bg-muted text-muted-foreground hover:bg-muted/80",
+                        : "bg-muted text-muted-foreground",
+                    i <= maxReached && i !== step && "hover:bg-muted/80",
+                    i > maxReached && "cursor-default opacity-60",
                     highlight && i !== step && "ring-2 ring-purple-500/40"
                   )}
-                  aria-label={`Ir a pregunta ${i + 1}`}
+                  aria-label={
+                    i > maxReached
+                      ? `Pregunta ${i + 1} todavía bloqueada`
+                      : `Ir a pregunta ${i + 1}`
+                  }
                 >
                   {i + 1}
                 </button>
@@ -560,76 +692,54 @@ export default function AssessmentDetail() {
             </motion.div>
           </AnimatePresence>
 
-          <div className="flex flex-col gap-3 border-t border-border/50 pt-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => void saveAnswer()}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-purple-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-purple-600/20 transition-all hover:bg-purple-500 active:scale-[0.98] disabled:opacity-60"
-              >
-                <HugeiconsIcon
-                  icon={FloppyDiskIcon}
-                  strokeWidth={2}
-                  className="size-3.5"
-                />
-                Guardar respuesta
-              </button>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => void clearAnswer()}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-background/60 px-4 py-2 text-xs font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-[0.98] disabled:opacity-60"
-              >
-                <HugeiconsIcon
-                  icon={Delete02Icon}
-                  strokeWidth={2}
-                  className="size-3.5"
-                />
-                Quitar respuesta
-              </button>
-            </div>
+          <div className="flex flex-col-reverse gap-2 border-t border-border/50 pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <button
+              type="button"
+              disabled={step === 0 || busy}
+              onClick={() => void goBack()}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border/70 bg-background/50 px-4 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-muted active:scale-[0.98] disabled:opacity-40"
+            >
+              <HugeiconsIcon
+                icon={ArrowLeft01Icon}
+                strokeWidth={2}
+                className="size-4"
+              />
+              Anterior
+            </button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              {getAnswer(answers, current.id) && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void clearAnswer()}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border/70 bg-background/60 px-4 py-2.5 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-[0.98] disabled:opacity-60"
+                >
+                  <HugeiconsIcon
+                    icon={Delete02Icon}
+                    strokeWidth={2}
+                    className="size-3.5"
+                  />
+                  Quitar
+                </button>
+              )}
               <button
                 type="button"
-                disabled={step === 0 || busy}
-                onClick={() => setStep((s) => Math.max(0, s - 1))}
-                className="inline-flex size-9 items-center justify-center rounded-xl border border-border/70 bg-background/50 transition-all hover:bg-muted disabled:opacity-40"
-                aria-label="Anterior"
+                disabled={busy}
+                onClick={() => void follow()}
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-purple-600/20 transition-all hover:bg-purple-500 active:scale-[0.98] disabled:opacity-60"
               >
-                <HugeiconsIcon
-                  icon={ArrowLeft01Icon}
-                  strokeWidth={2}
-                  className="size-4"
-                />
-              </button>
-              <button
-                type="button"
-                disabled={step >= questions.length - 1 || busy}
-                onClick={() =>
-                  setStep((s) => Math.min(questions.length - 1, s + 1))
-                }
-                className="inline-flex size-9 items-center justify-center rounded-xl border border-border/70 bg-background/50 transition-all hover:bg-muted disabled:opacity-40"
-                aria-label="Siguiente"
-              >
-                <HugeiconsIcon
-                  icon={ArrowRight01Icon}
-                  strokeWidth={2}
-                  className="size-4"
-                />
+                {busy ? "Guardando…" : primaryLabel}
+                {!busy && (
+                  <HugeiconsIcon
+                    icon={ArrowRight01Icon}
+                    strokeWidth={2}
+                    className="size-4"
+                  />
+                )}
               </button>
             </div>
           </div>
-
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void completeAssessment()}
-            className="w-full rounded-2xl border border-emerald-500/30 bg-emerald-500/10 py-3 text-sm font-semibold text-emerald-700 transition-all hover:bg-emerald-500/20 active:scale-[0.99] disabled:opacity-60 dark:text-emerald-300"
-          >
-            Completar evaluación
-          </button>
         </motion.div>
       )}
     </div>

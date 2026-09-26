@@ -32,9 +32,16 @@ import CourseOrderPicker from '../../_ui/CourseOrderPicker';
 interface FormEditRoadmapProps {
     roadmap: RoadmapView;
     catalog: PublishedCourseOption[];
+    listHref?: string;
+    canEditProgress?: boolean;
 }
 
-export default function FormEditRoadmap({ roadmap, catalog }: FormEditRoadmapProps) {
+export default function FormEditRoadmap({
+    roadmap,
+    catalog,
+    listHref = '/admin/roadmaps',
+    canEditProgress = false,
+}: FormEditRoadmapProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [isDeleting, startDelete] = useTransition();
@@ -130,7 +137,7 @@ export default function FormEditRoadmap({ roadmap, catalog }: FormEditRoadmapPro
                 description: result.msg,
                 type: 'success',
             });
-            router.push('/admin/roadmaps');
+            router.push(listHref);
             router.refresh();
         });
     };
@@ -155,7 +162,7 @@ export default function FormEditRoadmap({ roadmap, catalog }: FormEditRoadmapPro
                 description: result.msg,
                 type: 'success',
             });
-            router.push('/admin/roadmaps');
+            router.push(listHref);
             router.refresh();
         });
     };
@@ -172,7 +179,7 @@ export default function FormEditRoadmap({ roadmap, catalog }: FormEditRoadmapPro
             >
                 <div className="flex items-center gap-2">
                     <Link
-                        href="/admin/roadmaps"
+                        href={listHref}
                         className="group inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-background/50 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-border hover:bg-accent hover:text-foreground active:scale-[0.98]"
                     >
                         <HugeiconsIcon
@@ -192,8 +199,18 @@ export default function FormEditRoadmap({ roadmap, catalog }: FormEditRoadmapPro
                             Editar roadmap
                         </h1>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Ajusta el título, el orden de cursos y el progreso por curso.
+                            {canEditProgress
+                                ? 'Ajusta el título, el orden de cursos y el progreso por curso.'
+                                : 'Ajusta el título y el orden de cursos.'}
                         </p>
+                        {roadmap.rationale ? (
+                            <p className="mt-3 max-w-xl text-sm text-foreground">
+                                <span className="font-semibold">
+                                    Hemos seleccionado los mejores cursos para ti.
+                                </span>{' '}
+                                {roadmap.rationale}
+                            </p>
+                        ) : null}
                     </div>
                     <div className="hidden size-11 shrink-0 items-center justify-center rounded-2xl border border-purple-500/20 bg-purple-500/10 text-purple-600 shadow-xs sm:flex dark:text-purple-400">
                         <HugeiconsIcon icon={Route01Icon} strokeWidth={2} className="size-5" />
@@ -296,53 +313,77 @@ export default function FormEditRoadmap({ roadmap, catalog }: FormEditRoadmapPro
                                                     {saving ? '…' : `${value}%`}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-3">
-                                                <input
-                                                    type="range"
-                                                    min={0}
-                                                    max={100}
-                                                    step={1}
-                                                    value={value}
-                                                    disabled={busy || saving}
-                                                    onChange={(e) =>
-                                                        setProgressValue(courseId, Number(e.target.value))
-                                                    }
-                                                    onPointerUp={(e) =>
-                                                        void persistProgress(
-                                                            courseId,
-                                                            Number((e.target as HTMLInputElement).value)
-                                                        )
-                                                    }
-                                                    className="h-2 flex-1 cursor-pointer accent-purple-600 disabled:opacity-50"
+                                            {canEditProgress ? (
+                                                <div className="flex items-center gap-3">
+                                                    <input
+                                                        type="range"
+                                                        min={0}
+                                                        max={100}
+                                                        step={1}
+                                                        value={value}
+                                                        disabled={busy || saving}
+                                                        onChange={(e) =>
+                                                            setProgressValue(courseId, Number(e.target.value))
+                                                        }
+                                                        onPointerUp={(e) =>
+                                                            void persistProgress(
+                                                                courseId,
+                                                                Number((e.target as HTMLInputElement).value)
+                                                            )
+                                                        }
+                                                        className="h-2 flex-1 cursor-pointer accent-purple-600 disabled:opacity-50"
+                                                        aria-label={`Progreso de ${labelFor(courseId)}`}
+                                                    />
+                                                    <input
+                                                        type="number"
+                                                        min={0}
+                                                        max={100}
+                                                        step={1}
+                                                        value={value}
+                                                        disabled={busy || saving}
+                                                        onChange={(e) =>
+                                                            setProgressValue(courseId, Number(e.target.value))
+                                                        }
+                                                        onBlur={(e) =>
+                                                            void persistProgress(
+                                                                courseId,
+                                                                Number(e.target.value)
+                                                            )
+                                                        }
+                                                        className="h-9 w-16 rounded-lg border border-border/70 bg-background/60 px-2 text-center text-xs font-semibold tabular-nums outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 disabled:opacity-50"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className="h-1.5 overflow-hidden rounded-full bg-muted"
+                                                    role="progressbar"
+                                                    aria-valuenow={value}
+                                                    aria-valuemin={0}
+                                                    aria-valuemax={100}
                                                     aria-label={`Progreso de ${labelFor(courseId)}`}
-                                                />
-                                                <input
-                                                    type="number"
-                                                    min={0}
-                                                    max={100}
-                                                    step={1}
-                                                    value={value}
-                                                    disabled={busy || saving}
-                                                    onChange={(e) =>
-                                                        setProgressValue(courseId, Number(e.target.value))
-                                                    }
-                                                    onBlur={(e) =>
-                                                        void persistProgress(
-                                                            courseId,
-                                                            Number(e.target.value)
-                                                        )
-                                                    }
-                                                    className="h-9 w-16 rounded-lg border border-border/70 bg-background/60 px-2 text-center text-xs font-semibold tabular-nums outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 disabled:opacity-50"
-                                                />
-                                            </div>
+                                                >
+                                                    <div
+                                                        className="h-full rounded-full bg-purple-600"
+                                                        style={{
+                                                            width: `${Math.min(100, Math.max(0, value))}%`,
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
                                         </li>
                                     );
                                 })}
                             </ul>
-                            <p className="text-[11px] text-muted-foreground">
-                                El progreso se guarda al soltar el slider o al salir del campo numérico.
-                                El orden de cursos se guarda con «Guardar cambios».
-                            </p>
+                            {canEditProgress ? (
+                                <p className="text-[11px] text-muted-foreground">
+                                    El progreso se guarda al soltar el slider o al salir del campo numérico.
+                                    El orden de cursos se guarda con «Guardar cambios».
+                                </p>
+                            ) : (
+                                <p className="text-[11px] text-muted-foreground">
+                                    El orden de cursos se guarda con «Guardar cambios».
+                                </p>
+                            )}
                         </div>
                     )}
 
@@ -363,7 +404,7 @@ export default function FormEditRoadmap({ roadmap, catalog }: FormEditRoadmapPro
 
                         <div className="flex flex-col-reverse gap-3 lg:flex-row lg:items-center">
                             <Link
-                                href="/admin/roadmaps"
+                                href={listHref}
                                 className="inline-flex h-11 items-center justify-center rounded-xl border border-border/80 bg-background/50 px-5 text-sm font-medium text-foreground transition-all hover:bg-muted active:scale-[0.98]"
                             >
                                 Cancelar

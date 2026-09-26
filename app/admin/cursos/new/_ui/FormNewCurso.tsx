@@ -331,12 +331,15 @@ export default function FormNewCurso({
     }
 
     return (
-        <div className="mx-auto w-full max-w-3xl py-2 sm:py-6">
+        <div
+            data-lenis-prevent
+            className="mx-auto h-[calc(100dvh-7.5rem)] min-h-0 w-full min-w-0 max-w-3xl space-y-0 overflow-y-auto overscroll-y-contain py-2 sm:py-6"
+        >
             <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="mb-6 flex flex-col gap-2"
+                className="mb-6 flex min-w-0 flex-col gap-2"
             >
                 <div className="flex items-center gap-2">
                     <Link
@@ -383,7 +386,7 @@ export default function FormNewCurso({
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: 0.05 }}
-                className="relative overflow-hidden rounded-2xl border border-border/80 bg-card p-6 shadow-xs sm:p-8 dark:border-white/10 dark:bg-zinc-950/60 dark:shadow-2xl"
+                className="relative min-w-0 overflow-hidden rounded-2xl border border-border/80 bg-card p-4 shadow-xs sm:p-6 md:p-8 dark:border-white/10 dark:bg-zinc-950/60 dark:shadow-2xl"
             >
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="space-y-2">
@@ -725,14 +728,14 @@ export default function FormNewCurso({
                     <div className="flex flex-col-reverse gap-3 pt-3 sm:flex-row sm:items-center sm:justify-end">
                         <Link
                             href="/admin/cursos"
-                            className="inline-flex h-11 items-center justify-center rounded-xl border border-border/80 bg-background/50 px-5 text-sm font-medium text-foreground transition-all hover:border-border hover:bg-muted active:scale-[0.98]"
+                            className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-border/80 bg-background/50 px-5 text-sm font-medium text-foreground transition-all hover:border-border hover:bg-muted active:scale-[0.98] sm:w-auto"
                         >
                             Cancelar
                         </Link>
                         <button
                             type="submit"
                             disabled={isSaving}
-                            className="group relative inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-purple-600 px-6 text-sm font-semibold text-white shadow-sm outline-none transition-all hover:bg-purple-700 hover:shadow-purple-500/25 active:scale-[0.98] disabled:opacity-60 dark:bg-purple-600 dark:hover:bg-purple-500"
+                            className="group relative inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-6 text-sm font-semibold text-white shadow-sm outline-none transition-all hover:bg-purple-700 hover:shadow-purple-500/25 active:scale-[0.98] disabled:opacity-60 sm:w-auto dark:bg-purple-600 dark:hover:bg-purple-500"
                         >
                             <HugeiconsIcon
                                 icon={CheckmarkCircle02Icon}

@@ -34,6 +34,7 @@ export const getCursosAction = async (opts?: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${session.user.tokenAuth}`,
             },
+            cache: "no-store",
         });
         const body = await resp.json();
 

@@ -23,6 +23,7 @@ export const getLevelsAction = async () => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${session.user.tokenAuth}`,
             },
+            cache: "no-store",
         });
         const body = await resp.json();
 

@@ -5,6 +5,9 @@ import type { CursoItem } from "@/types/curso-schema";
 import { revalidatePath } from "next/cache";
 
 function nestMsg(body: { message?: string | string[] }, fallback: string) {
+    if (body.message === "Complete the course before publishing") {
+        return "No se puede publicar todavía. Faltan la imagen, la duración, una categoría o una tecnología. Complétalos, guarda el curso y vuelve a intentar.";
+    }
     if (typeof body.message === "string") return body.message;
     if (Array.isArray(body.message)) return body.message.join(", ");
     return fallback;

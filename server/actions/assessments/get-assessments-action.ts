@@ -3,7 +3,7 @@
 import { auth } from "@/server/auth";
 import type { Assessment } from "@/types/assessment-schema";
 
-export const getAssessmentsAction = async () => {
+async function fetchAssessments(path: string, fallback: string) {
   try {
     const session = await auth();
     if (!session) {
@@ -11,7 +11,7 @@ export const getAssessmentsAction = async () => {
     }
 
     const url = process.env.ADDRESS_SERVER;
-    const resp = await fetch(`${url}/api/assessments`, {
+    const resp = await fetch(`${url}${path}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.user.tokenAuth}`,
@@ -23,7 +23,7 @@ export const getAssessmentsAction = async () => {
     if (!resp.ok) {
       return {
         ok: false as const,
-        msg: (body?.message as string) || "Error al obtener las evaluaciones",
+        msg: (body?.message as string) || fallback,
       };
     }
 
@@ -33,6 +33,12 @@ export const getAssessmentsAction = async () => {
       msg: "Evaluaciones obtenidas exitosamente",
     };
   } catch {
-    return { ok: false as const, msg: "Error al obtener las evaluaciones" };
+    return { ok: false as const, msg: fallback };
   }
-};
+}
+
+export const getAssessmentsAction = async () =>
+  fetchAssessments("/api/assessments", "Error al obtener las evaluaciones");
+
+export const getAllAssessmentsAction = async () =>
+  fetchAssessments("/api/assessments/all", "Error al obtener las evaluaciones");

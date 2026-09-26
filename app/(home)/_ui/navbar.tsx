@@ -18,7 +18,7 @@ export const navigationFor = (session: Session | null) => {
     const isAdmin = session?.user?.role?.toLowerCase() === 'admin'
 
     return [
-        { name: 'Mi perfil', href: home ?? '/login' },
+        { name: 'Mi perfil', href: session?.user ? '/profile' : '/login' },
         { name: 'Features', href: '/#features' },
         { name: 'Marketplace', href: isAdmin ? '/admin/cursos' : (home ?? '/login') },
     ]

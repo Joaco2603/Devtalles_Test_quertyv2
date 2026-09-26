@@ -3,7 +3,7 @@ import SidebarApp from "../_ui/Sidebar";
 import AssessmentsList from "./_ui/AssessmentsList";
 
 export const metadata: Metadata = {
-  title: "Evaluaciones | Admin Devtalles",
+  title: "Cuestionarios | Devtalles",
   description: "Responder cuestionarios y gestionar intentos de evaluación.",
 };
 

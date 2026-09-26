@@ -58,6 +58,29 @@ import {
     type CursoItem,
 } from './curso-helpers';
 
+function columnLayoutClass(columnId: string) {
+    switch (columnId) {
+        case 'select':
+            return 'w-[5%] 2xl:w-[4%]';
+        case 'title':
+            return 'w-[25%] max-w-0 overflow-hidden 2xl:w-[22%]';
+        case 'instructor':
+            return 'w-[14%] max-w-0 overflow-hidden 2xl:w-[13%]';
+        case 'level':
+            return 'w-[11%] 2xl:w-[10%]';
+        case 'duration':
+            return 'hidden 2xl:table-cell 2xl:w-[8%]';
+        case 'status':
+            return 'w-[11%] 2xl:w-[10%]';
+        case 'categories':
+            return 'w-[14%] whitespace-normal 2xl:w-[13%]';
+        case 'actions':
+            return 'w-[20%] whitespace-normal 2xl:w-[20%]';
+        default:
+            return undefined;
+    }
+}
+
 const globalSearchFilter: FilterFn<CursoItem> = (row, _columnId, filterValue) => {
     const q = String(filterValue ?? '')
         .toLowerCase()
@@ -252,7 +275,7 @@ export default function CursosTable({
                     </div>
                 ),
                 cell: ({ row }) => (
-                    <span className="text-sm text-foreground/90">
+                    <span className="block truncate text-sm text-foreground/90">
                         {row.original.instructor ?? '—'}
                     </span>
                 ),
@@ -341,7 +364,7 @@ export default function CursosTable({
                 cell: ({ row }) => {
                     const course = row.original;
                     return (
-                        <div className="flex flex-wrap items-center justify-end gap-1.5 pr-2">
+                        <div className="flex flex-wrap items-center justify-end gap-1.5">
                             <Link
                                 href={`/admin/cursos/new?id=${course.id}`}
                                 className="group inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-background/60 px-2.5 py-1.5 text-xs font-medium text-foreground transition-all duration-200 hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-600 active:scale-[0.97] dark:hover:text-purple-400"
@@ -352,7 +375,7 @@ export default function CursosTable({
                                     strokeWidth={2}
                                     className="size-3.5"
                                 />
-                                <span>Editar</span>
+                                <span className="max-2xl:sr-only">Editar</span>
                             </Link>
                             <button
                                 type="button"
@@ -372,7 +395,7 @@ export default function CursosTable({
                                     strokeWidth={2}
                                     className="size-3.5"
                                 />
-                                <span className="hidden lg:inline">Publicar</span>
+                                <span className="max-2xl:sr-only">Publicar</span>
                             </button>
                             <button
                                 type="button"
@@ -392,7 +415,7 @@ export default function CursosTable({
                                     strokeWidth={2}
                                     className="size-3.5"
                                 />
-                                <span className="hidden xl:inline">Borrador</span>
+                                <span className="max-2xl:sr-only">Borrador</span>
                             </button>
                             <button
                                 type="button"
@@ -412,7 +435,7 @@ export default function CursosTable({
                                     strokeWidth={2}
                                     className="size-3.5"
                                 />
-                                <span className="hidden xl:inline">Archivar</span>
+                                <span className="max-2xl:sr-only">Archivar</span>
                             </button>
                         </div>
                     );
@@ -455,15 +478,73 @@ export default function CursosTable({
         setPagination((p) => ({ ...p, pageIndex: 0 }));
     };
 
+    const emptyState = (
+        <div className="flex flex-col items-center justify-center gap-3 py-10">
+            <div className="flex size-14 items-center justify-center rounded-2xl border border-border/80 bg-muted/40 text-muted-foreground">
+                <HugeiconsIcon
+                    icon={BookOpen01Icon}
+                    strokeWidth={1.5}
+                    className="size-7"
+                />
+            </div>
+            <div className="space-y-1 text-center">
+                <h3 className="text-base font-semibold text-foreground">
+                    {globalFilter || levelFilter !== 'all'
+                        ? 'No se encontraron resultados'
+                        : 'No hay cursos registrados'}
+                </h3>
+                <p className="max-w-sm text-xs text-muted-foreground">
+                    {globalFilter
+                        ? `Ningún curso coincide con "${globalFilter}".`
+                        : levelFilter !== 'all'
+                          ? `No hay cursos con nivel ${LEVEL_LABELS[levelFilter]}.`
+                          : 'Comienza creando el primer curso del catálogo.'}
+                </p>
+            </div>
+            {globalFilter || levelFilter !== 'all' ? (
+                <button
+                    type="button"
+                    onClick={() => {
+                        setGlobalFilter('');
+                        setLevelFilter('all');
+                    }}
+                    className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-border/70 bg-background/80 px-4 py-2 text-xs font-semibold text-foreground transition-all hover:bg-muted active:scale-[0.98]"
+                >
+                    <HugeiconsIcon
+                        icon={Cancel01Icon}
+                        strokeWidth={2}
+                        className="size-3.5"
+                    />
+                    <span>Limpiar filtros</span>
+                </button>
+            ) : (
+                <Link
+                    href="/admin/cursos/new"
+                    className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-xs font-semibold text-white shadow-md shadow-purple-600/20 transition-all hover:bg-purple-500 active:scale-[0.98]"
+                >
+                    <HugeiconsIcon
+                        icon={PlusSignIcon}
+                        strokeWidth={2}
+                        className="size-3.5"
+                    />
+                    <span>Crear primer curso</span>
+                </Link>
+            )}
+        </div>
+    );
+
     return (
-        <div className="mx-auto w-full max-w-7xl space-y-8 py-2 sm:py-6">
+        <div
+            data-lenis-prevent
+            className="mx-auto h-[calc(100dvh-7.5rem)] min-h-0 w-full min-w-0 max-w-7xl space-y-8 overflow-y-auto overscroll-y-contain py-2 sm:py-6"
+        >
             <motion.div
                 initial={{ opacity: 0, y: -12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-                className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"
+                className="relative flex min-w-0 flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
             >
-                <div className="space-y-2">
+                <div className="min-w-0 space-y-2">
                     <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
                         Cursos
                     </h1>
@@ -473,10 +554,10 @@ export default function CursosTable({
                     </p>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-3">
+                <div className="flex w-full shrink-0 items-center gap-3 lg:w-auto">
                     <Link
                         href="/admin/cursos/new"
-                        className="group relative inline-flex items-center justify-between gap-3.5 rounded-full bg-purple-600 py-2.5 pr-2.5 pl-6 text-sm font-semibold text-white shadow-xl shadow-purple-600/25 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-purple-500 hover:shadow-purple-500/40 active:scale-[0.98]"
+                        className="group relative inline-flex w-full items-center justify-between gap-3.5 rounded-full bg-purple-600 py-2.5 pr-2.5 pl-6 text-sm font-semibold text-white shadow-xl shadow-purple-600/25 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-purple-500 hover:shadow-purple-500/40 active:scale-[0.98] lg:w-auto"
                     >
                         <span>Nuevo curso</span>
                         <span className="flex size-7 items-center justify-center rounded-full bg-white/20 text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-110 group-hover:translate-x-0.5">
@@ -505,12 +586,12 @@ export default function CursosTable({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.12, ease: [0.32, 0.72, 0, 1] }}
-                className="relative rounded-[2rem] bg-black/[0.02] p-1.5 shadow-2xl shadow-purple-950/5 ring-1 ring-black/[0.06] sm:p-2.5 dark:bg-white/[0.02] dark:ring-white/10"
+                className="relative min-w-0 rounded-[2rem] bg-black/[0.02] p-1.5 shadow-2xl shadow-purple-950/5 ring-1 ring-black/[0.06] sm:p-2.5 dark:bg-white/[0.02] dark:ring-white/10"
             >
-                <div className="relative flex flex-col overflow-hidden rounded-[calc(2rem-0.625rem)] border border-border/60 bg-card/95 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-xl dark:border-white/[0.08] dark:bg-zinc-950/80">
-                    <div className="flex flex-col gap-4 border-b border-border/50 p-4 sm:px-6 sm:py-5">
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="relative flex-1 sm:max-w-md">
+                <div className="relative flex min-w-0 flex-col overflow-hidden rounded-[calc(2rem-0.625rem)] border border-border/60 bg-card/95 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-xl dark:border-white/[0.08] dark:bg-zinc-950/80">
+                    <div className="flex min-w-0 flex-col gap-4 border-b border-border/50 p-4 sm:px-6 sm:py-5">
+                        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                            <div className="relative min-w-0 flex-1 sm:max-w-md">
                                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted-foreground/70">
                                     <HugeiconsIcon
                                         icon={Search01Icon}
@@ -529,7 +610,7 @@ export default function CursosTable({
                                         }));
                                     }}
                                     placeholder="Buscar por título, instructor o categoría..."
-                                    className="h-10 w-full rounded-xl border border-border/70 bg-background/50 pr-9 pl-10 text-xs font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground/60 hover:border-foreground/30 focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 dark:focus:border-purple-500"
+                                    className="h-10 w-full min-w-0 rounded-xl border border-border/70 bg-background/50 pr-9 pl-10 text-xs font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground/60 hover:border-foreground/30 focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 dark:focus:border-purple-500"
                                 />
                                 {globalFilter && (
                                     <button
@@ -547,7 +628,7 @@ export default function CursosTable({
                                 )}
                             </div>
 
-                            <div className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-border/50 bg-muted/30 px-3 text-xs font-semibold text-muted-foreground">
+                            <div className="inline-flex h-10 w-fit shrink-0 items-center gap-1.5 rounded-xl border border-border/50 bg-muted/30 px-3 text-xs font-semibold text-muted-foreground">
                                 <HugeiconsIcon
                                     icon={Layers01Icon}
                                     strokeWidth={2}
@@ -573,7 +654,7 @@ export default function CursosTable({
                                 animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.2 }}
-                                className="flex items-center justify-between border-b border-purple-500/20 bg-purple-500/10 px-4 py-2.5 sm:px-6"
+                                className="flex flex-col gap-2 border-b border-purple-500/20 bg-purple-500/10 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-6"
                             >
                                 <div className="flex items-center gap-2 text-xs font-medium text-purple-700 dark:text-purple-300">
                                     <span className="flex size-5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white">
@@ -592,8 +673,166 @@ export default function CursosTable({
                         )}
                     </AnimatePresence>
 
-                    <div className="relative w-full overflow-x-auto">
-                        <Table className="w-full">
+                    <div className="xl:hidden">
+                        {table.getRowModel().rows?.length ? (
+                            <div className="space-y-3 p-4">
+                                <div className="flex items-center gap-2 px-0.5 pb-1">
+                                    <Checkbox
+                                        checked={table.getIsAllPageRowsSelected()}
+                                        onCheckedChange={(value) =>
+                                            table.toggleAllPageRowsSelected(!!value)
+                                        }
+                                        aria-label="Seleccionar todos los cursos visibles"
+                                    />
+                                    <span className="text-xs font-medium text-muted-foreground">
+                                        Seleccionar página
+                                    </span>
+                                </div>
+                                {table.getRowModel().rows.map((row) => {
+                                    const course = row.original;
+                                    return (
+                                        <div
+                                            key={row.id}
+                                            className={cn(
+                                                'rounded-2xl border border-border/60 bg-background/40 p-4 transition-colors',
+                                                row.getIsSelected() &&
+                                                    'border-purple-500/40 bg-purple-500/10'
+                                            )}
+                                        >
+                                            <div className="flex items-start gap-3">
+                                                <div className="pt-1">
+                                                    <Checkbox
+                                                        checked={row.getIsSelected()}
+                                                        onCheckedChange={(value) =>
+                                                            row.toggleSelected(!!value)
+                                                        }
+                                                        aria-label={`Seleccionar curso ${course.title}`}
+                                                    />
+                                                </div>
+                                                <div className="flex min-w-0 flex-1 items-start gap-3">
+                                                    <div className="relative flex size-10 shrink-0 items-center justify-center rounded-xl border border-purple-500/25 bg-gradient-to-br from-purple-500/15 via-purple-600/10 to-fuchsia-500/10 text-purple-600 shadow-xs dark:text-purple-400">
+                                                        <HugeiconsIcon
+                                                            icon={BookOpen01Icon}
+                                                            strokeWidth={2}
+                                                            className="size-4.5"
+                                                        />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1 space-y-1">
+                                                        <p className="truncate text-sm font-semibold tracking-tight text-foreground">
+                                                            {course.title}
+                                                        </p>
+                                                        <p className="text-[11px] text-muted-foreground/75">
+                                                            ID {course.id}
+                                                            {course.instructor
+                                                                ? ` · ${course.instructor}`
+                                                                : ''}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-3 flex flex-wrap items-center gap-2 pl-8">
+                                                {course.level ? (
+                                                    <span className="inline-flex rounded-lg border border-border/60 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                                                        {LEVEL_LABELS[course.level]}
+                                                    </span>
+                                                ) : null}
+                                                <StatusBadge status={course.status} />
+                                                {course.categories.map((cat) => (
+                                                    <span
+                                                        key={cat.id}
+                                                        className="rounded-md border border-purple-500/20 bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-medium text-purple-700 dark:text-purple-300"
+                                                    >
+                                                        {cat.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+
+                                            <div className="mt-3 flex flex-wrap items-center gap-1.5 pl-8">
+                                                <Link
+                                                    href={`/admin/cursos/new?id=${course.id}`}
+                                                    className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-border/70 bg-background/60 px-3 py-2 text-xs font-medium text-foreground transition-all duration-200 hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-600 active:scale-[0.97] dark:hover:text-purple-400"
+                                                    title="Editar este curso"
+                                                >
+                                                    <HugeiconsIcon
+                                                        icon={PencilEdit02Icon}
+                                                        strokeWidth={2}
+                                                        className="size-3.5"
+                                                    />
+                                                    <span>Editar</span>
+                                                </Link>
+                                                <button
+                                                    type="button"
+                                                    disabled={isPending}
+                                                    onClick={() =>
+                                                        runStatusAction(
+                                                            course,
+                                                            'published',
+                                                            publishCursoAction
+                                                        )
+                                                    }
+                                                    className="inline-flex min-h-11 items-center gap-1 rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-xs font-medium text-emerald-700 transition-all hover:bg-emerald-500/15 active:scale-[0.97] disabled:opacity-50 dark:text-emerald-400"
+                                                    title="Publicar"
+                                                >
+                                                    <HugeiconsIcon
+                                                        icon={CheckmarkCircle02Icon}
+                                                        strokeWidth={2}
+                                                        className="size-3.5"
+                                                    />
+                                                    <span>Publicar</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    disabled={isPending}
+                                                    onClick={() =>
+                                                        runStatusAction(
+                                                            course,
+                                                            'draft',
+                                                            draftCursoAction
+                                                        )
+                                                    }
+                                                    className="inline-flex min-h-11 items-center gap-1 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs font-medium text-amber-700 transition-all hover:bg-amber-500/15 active:scale-[0.97] disabled:opacity-50 dark:text-amber-400"
+                                                    title="Pasar a borrador"
+                                                >
+                                                    <HugeiconsIcon
+                                                        icon={FileEditIcon}
+                                                        strokeWidth={2}
+                                                        className="size-3.5"
+                                                    />
+                                                    <span>Borrador</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    disabled={isPending}
+                                                    onClick={() =>
+                                                        runStatusAction(
+                                                            course,
+                                                            'archived',
+                                                            archiveCursoAction
+                                                        )
+                                                    }
+                                                    className="inline-flex min-h-11 items-center gap-1 rounded-xl border border-zinc-500/30 bg-zinc-500/5 px-3 py-2 text-xs font-medium text-zinc-600 transition-all hover:bg-zinc-500/15 active:scale-[0.97] disabled:opacity-50 dark:text-zinc-400"
+                                                    title="Archivar"
+                                                >
+                                                    <HugeiconsIcon
+                                                        icon={Archive02Icon}
+                                                        strokeWidth={2}
+                                                        className="size-3.5"
+                                                    />
+                                                    <span>Archivar</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="px-4 py-6">{emptyState}</div>
+                        )}
+                    </div>
+
+                    <div className="relative hidden w-full min-w-0 overflow-x-auto xl:block">
+                        <Table className="w-full table-fixed">
                             <TableHeader>
                                 {table.getHeaderGroups().map((headerGroup) => (
                                     <TableRow
@@ -603,13 +842,10 @@ export default function CursosTable({
                                         {headerGroup.headers.map((header) => (
                                             <TableHead
                                                 key={header.id}
-                                                className="h-11 px-4 text-xs select-none"
-                                                style={{
-                                                    width:
-                                                        header.getSize() !== 150
-                                                            ? header.getSize()
-                                                            : undefined,
-                                                }}
+                                                className={cn(
+                                                    'h-11 px-3 text-xs select-none',
+                                                    columnLayoutClass(header.column.id)
+                                                )}
                                             >
                                                 {header.isPlaceholder
                                                     ? null
@@ -641,7 +877,10 @@ export default function CursosTable({
                                             {row.getVisibleCells().map((cell) => (
                                                 <TableCell
                                                     key={cell.id}
-                                                    className="px-4 py-3 text-sm"
+                                                    className={cn(
+                                                        'px-3 py-3 text-sm',
+                                                        columnLayoutClass(cell.column.id)
+                                                    )}
                                                 >
                                                     {flexRender(
                                                         cell.column.columnDef.cell,
@@ -657,60 +896,7 @@ export default function CursosTable({
                                             colSpan={columns.length}
                                             className="h-64 text-center"
                                         >
-                                            <div className="flex flex-col items-center justify-center gap-3 py-10">
-                                                <div className="flex size-14 items-center justify-center rounded-2xl border border-border/80 bg-muted/40 text-muted-foreground">
-                                                    <HugeiconsIcon
-                                                        icon={BookOpen01Icon}
-                                                        strokeWidth={1.5}
-                                                        className="size-7"
-                                                    />
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <h3 className="text-base font-semibold text-foreground">
-                                                        {globalFilter ||
-                                                        levelFilter !== 'all'
-                                                            ? 'No se encontraron resultados'
-                                                            : 'No hay cursos registrados'}
-                                                    </h3>
-                                                    <p className="max-w-sm text-xs text-muted-foreground">
-                                                        {globalFilter
-                                                            ? `Ningún curso coincide con "${globalFilter}".`
-                                                            : levelFilter !== 'all'
-                                                              ? `No hay cursos con nivel ${LEVEL_LABELS[levelFilter]}.`
-                                                              : 'Comienza creando el primer curso del catálogo.'}
-                                                    </p>
-                                                </div>
-                                                {globalFilter ||
-                                                levelFilter !== 'all' ? (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setGlobalFilter('');
-                                                            setLevelFilter('all');
-                                                        }}
-                                                        className="mt-2 inline-flex items-center gap-1.5 rounded-xl border border-border/70 bg-background/80 px-4 py-2 text-xs font-semibold text-foreground transition-all hover:bg-muted active:scale-[0.98]"
-                                                    >
-                                                        <HugeiconsIcon
-                                                            icon={Cancel01Icon}
-                                                            strokeWidth={2}
-                                                            className="size-3.5"
-                                                        />
-                                                        <span>Limpiar filtros</span>
-                                                    </button>
-                                                ) : (
-                                                    <Link
-                                                        href="/admin/cursos/new"
-                                                        className="mt-2 inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-xs font-semibold text-white shadow-md shadow-purple-600/20 transition-all hover:bg-purple-500 active:scale-[0.98]"
-                                                    >
-                                                        <HugeiconsIcon
-                                                            icon={PlusSignIcon}
-                                                            strokeWidth={2}
-                                                            className="size-3.5"
-                                                        />
-                                                        <span>Crear primer curso</span>
-                                                    </Link>
-                                                )}
-                                            </div>
+                                            {emptyState}
                                         </TableCell>
                                     </TableRow>
                                 )}
@@ -719,7 +905,7 @@ export default function CursosTable({
                     </div>
 
                     <div className="flex flex-col items-center justify-between gap-4 border-t border-border/50 px-4 py-3.5 sm:flex-row sm:px-6">
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-center text-xs text-muted-foreground sm:text-left">
                             {table.getFilteredRowModel().rows.length > 0 ? (
                                 <>
                                     Mostrando{' '}
@@ -751,7 +937,7 @@ export default function CursosTable({
                                 type="button"
                                 onClick={() => table.previousPage()}
                                 disabled={!table.getCanPreviousPage()}
-                                className="inline-flex size-8 items-center justify-center rounded-lg border border-border/70 bg-background/50 text-foreground transition-all hover:bg-muted active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40"
+                                className="inline-flex size-11 items-center justify-center rounded-lg border border-border/70 bg-background/50 text-foreground transition-all hover:bg-muted active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 sm:size-8"
                                 title="Página anterior"
                             >
                                 <HugeiconsIcon
@@ -778,7 +964,7 @@ export default function CursosTable({
                                 type="button"
                                 onClick={() => table.nextPage()}
                                 disabled={!table.getCanNextPage()}
-                                className="inline-flex size-8 items-center justify-center rounded-lg border border-border/70 bg-background/50 text-foreground transition-all hover:bg-muted active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40"
+                                className="inline-flex size-11 items-center justify-center rounded-lg border border-border/70 bg-background/50 text-foreground transition-all hover:bg-muted active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 sm:size-8"
                                 title="Página siguiente"
                             >
                                 <HugeiconsIcon

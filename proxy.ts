@@ -1,68 +1,54 @@
 import { auth } from "@/server/auth";
 import { NextResponse } from "next/server";
 
-const ADMIN_ONLY_PREFIXES = [
-    "/admin/users",
-    "/admin/roles",
-    "/admin/categorias",
-    "/admin/technologies",
-    "/admin/cursos",
-    "/admin/roadmaps",
-    "/admin/questionnaires",
-    "/admin/audience",
-    "/admin/competitor",
-    "/admin/sentiment",
-    "/admin/calendar",
-];
+function panelDestination(pathname: string) {
+    if (pathname === "/panel" || pathname === "/panel/") return "/admin";
+    if (pathname === "/panel/roadmaps" || pathname === "/panel/roadmaps/") {
+        return "/admin/roadmaps/mios";
+    }
+    if (pathname.startsWith("/panel/roadmaps/globales")) {
+        return "/admin/roadmaps/globales";
+    }
+    if (pathname.startsWith("/panel/cuestionarios")) {
+        return pathname.replace("/panel/cuestionarios", "/admin/assessments");
+    }
+    const owned = pathname.match(/^\/panel\/roadmaps\/(\d+)\/?$/);
+    if (owned) return `/admin/roadmaps/${owned[1]}`;
+    return "/admin";
+}
 
-function isAdminOnlyPath(pathname: string) {
-    return ADMIN_ONLY_PREFIXES.some(
-        (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-    );
+function userCanOpenAdminPath(pathname: string) {
+    if (pathname === "/admin") return true;
+    if (pathname === "/admin/profile" || pathname.startsWith("/admin/profile/")) return true;
+    if (pathname.startsWith("/admin/roadmaps")) return true;
+    if (pathname.startsWith("/admin/assessments")) return true;
+    return false;
 }
 
 export default auth((req) => {
-    if (!isAdminOnlyPath(req.nextUrl.pathname)) {
-        return NextResponse.next();
+    const { pathname } = req.nextUrl;
+
+    if (pathname === "/panel" || pathname.startsWith("/panel/")) {
+        return NextResponse.redirect(new URL(panelDestination(pathname), req.nextUrl.origin));
     }
 
+    const isAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
+    if (!isAdminPath) return NextResponse.next();
+
     const role = req.auth?.user?.role?.toLowerCase();
-    if (role === "admin") {
-        return NextResponse.next();
-    }
+    if (role === "admin") return NextResponse.next();
 
     if (!req.auth) {
         const login = new URL("/login", req.nextUrl.origin);
-        login.searchParams.set("callbackUrl", req.nextUrl.pathname);
+        login.searchParams.set("callbackUrl", pathname);
         return NextResponse.redirect(login);
     }
 
-    return NextResponse.redirect(new URL("/", req.nextUrl.origin));
+    if (userCanOpenAdminPath(pathname)) return NextResponse.next();
+
+    return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
 });
 
 export const config = {
-    matcher: [
-        "/admin/users",
-        "/admin/users/:path*",
-        "/admin/roles",
-        "/admin/roles/:path*",
-        "/admin/categorias",
-        "/admin/categorias/:path*",
-        "/admin/technologies",
-        "/admin/technologies/:path*",
-        "/admin/cursos",
-        "/admin/cursos/:path*",
-        "/admin/roadmaps",
-        "/admin/roadmaps/:path*",
-        "/admin/questionnaires",
-        "/admin/questionnaires/:path*",
-        "/admin/audience",
-        "/admin/audience/:path*",
-        "/admin/competitor",
-        "/admin/competitor/:path*",
-        "/admin/sentiment",
-        "/admin/sentiment/:path*",
-        "/admin/calendar",
-        "/admin/calendar/:path*",
-    ],
+    matcher: ["/admin", "/admin/:path*", "/panel", "/panel/:path*"],
 };

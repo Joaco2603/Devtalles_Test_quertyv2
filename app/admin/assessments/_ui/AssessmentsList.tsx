@@ -120,7 +120,7 @@ export default function AssessmentsList() {
     setStartingId(null);
     if (!res.ok) {
       toast.add({
-        title: "No se pudo iniciar la evaluación",
+        title: "No se pudo iniciar el cuestionario",
         description: res.msg,
         type: "error",
       });
@@ -140,11 +140,11 @@ export default function AssessmentsList() {
       >
         <div className="space-y-2">
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-            Evaluaciones
+            Cuestionarios
           </h1>
           <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Responde cuestionarios activos, guarda respuestas y completa tus
-            intentos.
+            Responde uno y, al terminarlo, armamos tu roadmap personalizado con
+            IA.
           </p>
         </div>
 
@@ -153,7 +153,7 @@ export default function AssessmentsList() {
           onClick={() => void openPicker()}
           className="group relative inline-flex shrink-0 items-center justify-between gap-3.5 rounded-full bg-purple-600 py-2.5 pr-2.5 pl-6 text-sm font-semibold text-white shadow-xl shadow-purple-600/25 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-purple-500 hover:shadow-purple-500/40 active:scale-[0.98]"
         >
-          <span>Nueva evaluación</span>
+          <span>Empezar cuestionario</span>
           <span className="flex size-7 items-center justify-center rounded-full bg-white/20 text-white transition-transform duration-300 group-hover:scale-110 group-hover:translate-x-0.5">
             <HugeiconsIcon
               icon={PlusSignIcon}
@@ -272,8 +272,8 @@ export default function AssessmentsList() {
               Mis intentos
             </p>
             <span className="rounded-xl border border-border/50 bg-muted/30 px-3 py-1.5 text-xs font-semibold text-muted-foreground">
-              {ready ? sorted.length : "…"} evaluación
-              {ready && sorted.length === 1 ? "" : "es"}
+              {ready ? sorted.length : "…"} cuestionario
+              {ready && sorted.length === 1 ? "" : "s"}
             </span>
           </div>
 
@@ -300,8 +300,8 @@ export default function AssessmentsList() {
             )}
             {ready && !loadError && sorted.length === 0 && (
               <li className="px-6 py-10 text-center text-sm text-muted-foreground">
-                Todavía no tienes evaluaciones. Crea una con &ldquo;Nueva
-                evaluación&rdquo;.
+                Todavía no empezaste un cuestionario. Elige uno y armamos tu ruta
+                con IA.
               </li>
             )}
             {ready &&

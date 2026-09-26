@@ -5,15 +5,18 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import LearnMoreButton from '@/components/pixel-perfect/learn-more-button'
 import MagneticWarp from '@/components/pixel-perfect/magnetic-warp'
-import { authenticatedHome } from '@/lib/auth-routes'
 import Navbar from './navbar'
 // import RocketBlast from './ascii/rocket-blast'
 
 const Hero = () => {
     const { data: session } = useSession()
-    const home = session?.user ? authenticatedHome(session.user.role) : null
-    const discoverHref = home ?? '/register'
-    const roadmapsHref = home ?? '/login'
+    const isAdmin = session?.user?.role?.toLowerCase() === 'admin'
+    const discoverHref = !session?.user ? '/register' : '/admin/assessments'
+    const roadmapsHref = !session?.user
+        ? '/login'
+        : isAdmin
+            ? '/admin/roadmaps'
+            : '/admin/roadmaps/mios'
 
     return (
         <div className="bg-white dark:bg-gray-900">

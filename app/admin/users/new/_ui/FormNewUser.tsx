@@ -84,7 +84,10 @@ export default function FormNewUser({ clients }: FormNewUserProps) {
     };
 
     return (
-        <div className="mx-auto w-full max-w-2xl py-2 sm:py-6">
+        <div
+            data-lenis-prevent
+            className="mx-auto h-[calc(100dvh-7.5rem)] min-h-0 w-full max-w-2xl overflow-y-auto overscroll-y-contain py-2 sm:py-6"
+        >
             <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}

@@ -264,7 +264,10 @@ export default function QuestionnairesTable({
   });
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-8 py-2 sm:py-6">
+    <div
+      data-lenis-prevent
+      className="mx-auto h-[calc(100dvh-7.5rem)] min-h-0 w-full max-w-7xl space-y-8 overflow-y-auto overscroll-y-contain py-2 sm:py-6"
+    >
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
