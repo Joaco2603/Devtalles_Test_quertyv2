@@ -12,6 +12,7 @@ export const createCategoryAction = actionClient
         const url = process.env.ADDRESS_SERVER;
         try {
             const session = await auth();
+            console.log(session);
             if (!session) return { ok: false, msg: 'No tiene permisos para realizar esta operacion' };
             const nameSanitize = name.toLowerCase().trim();
             if (id) {
@@ -24,6 +25,7 @@ export const createCategoryAction = actionClient
                     body: JSON.stringify({ name: nameSanitize })
                 });
                 const data = await resp.json();
+                console.log(data);
                 if (!data.data) {
                     return {
                         ok: false,
