@@ -22,15 +22,15 @@ import { toast } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 import { getCategoriesAction } from '@/server/actions/categorias/get-categoria-action';
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
+// import { useSession } from 'next-auth/react';
 
 export default function FormNewCategoria() {
     const [chargetCategoria, setChargetCategoria] = useState(false);
     const router = useRouter();
     const params = useSearchParams();
     const editMode = params.get('id');
-    const { data: session } = useSession();
-    console.log(session);
+    // const { data: session } = useSession();
+    // console.log(session);
 
     const {
         register,
