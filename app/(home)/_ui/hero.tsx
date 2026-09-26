@@ -2,12 +2,19 @@
 
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import LearnMoreButton from '@/components/pixel-perfect/learn-more-button'
 import MagneticWarp from '@/components/pixel-perfect/magnetic-warp'
+import { authenticatedHome } from '@/lib/auth-routes'
 import Navbar from './navbar'
 // import RocketBlast from './ascii/rocket-blast'
 
 const Hero = () => {
+    const { data: session } = useSession()
+    const home = session?.user ? authenticatedHome(session.user.role) : null
+    const discoverHref = home ?? '/register'
+    const roadmapsHref = home ?? '/login'
+
     return (
         <div className="bg-white dark:bg-gray-900">
             <Navbar />
@@ -30,7 +37,7 @@ const Hero = () => {
                                 {/* Eyebrow Badge with interactive LearnMoreButton effects */}
                                 <div className="mb-7 flex">
                                     <LearnMoreButton
-                                        href="/register"
+                                        href={discoverHref}
                                         badge="2026"
                                         text="Roadmaps de Programación"
                                         actionText="Explorar"
@@ -51,7 +58,7 @@ const Hero = () => {
                                 {/* Moderate High-End Action CTAs */}
                                 <div className="mt-8 sm:mt-10 flex flex-wrap items-center gap-3.5 sm:gap-4">
                                     <Link
-                                        href="/register"
+                                        href={discoverHref}
                                         className="group inline-flex items-center justify-center gap-2.5 rounded-full bg-purple-600 dark:bg-purple-600 px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold text-white dark:text-neutral-950 shadow-sm transition-all duration-150 ease-out hover:bg-purple-700 dark:hover:bg-purple-700 active:scale-[0.98] cursor-pointer"
                                     >
                                         <span>Descubrir mi ruta</span>
@@ -61,7 +68,7 @@ const Hero = () => {
                                     </Link>
 
                                     <Link
-                                        href="/admin/roadmaps"
+                                        href={roadmapsHref}
                                         className="inline-flex items-center justify-center rounded-full border border-purple-600 dark:border-purple-600 bg-transparent px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold text-purple-600 dark:text-purple-600 transition-all duration-150 ease-out hover:border-purple-400 dark:hover:border-purple-600 hover:bg-purple-100/20 dark:hover:bg-purple-800/20 active:scale-[0.98] cursor-pointer"
                                     >
                                         Ver roadmaps
