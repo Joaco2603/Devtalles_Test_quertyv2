@@ -86,7 +86,7 @@ export const adminNavGroups: NavGroup[] = [
         items: [
             {
                 title: 'Gestión de Usuarios',
-                href: '/admin/users',
+                href: '/admin/usuarios',
                 icon: UserMultiple03Icon,
                 badge: '12',
                 badgeColor: 'bg-primary/10 text-primary font-medium',
@@ -114,55 +114,9 @@ export const adminNavGroups: NavGroup[] = [
         ],
     },
     {
-        label: 'Analíticas y Rendimiento',
-        items: [
-            {
-                title: 'Content Performance',
-                href: '/admin/content',
-                icon: ChartLineData01Icon,
-            },
-            {
-                title: 'Audience Insight',
-                href: '/admin/audience',
-                icon: UserMultiple03Icon,
-            },
-            {
-                title: 'Engagement Metrics',
-                href: '/admin/engagement',
-                icon: PieChartIcon,
-            },
-            {
-                title: 'Hashtag Performance',
-                href: '/admin/hashtags',
-                icon: HashtagIcon,
-                badge: 3,
-                badgeColor: 'bg-primary/10 text-primary',
-            },
-            {
-                title: 'Competitor Analysis',
-                href: '/admin/competitor',
-                icon: ArrowLeftRightIcon,
-            },
-            {
-                title: 'Sentiment Tracking',
-                href: '/admin/sentiment',
-                icon: TaskDaily01Icon,
-            },
-        ],
-    },
-    {
         label: 'Sistema y Configuración',
         items: [
-            {
-                title: 'Calendario Global',
-                href: '/admin/calendar',
-                icon: Calendar01Icon,
-            },
-            {
-                title: 'Reportes y Auditoría',
-                href: '/admin/reports',
-                icon: Undo03Icon,
-            },
+
             {
                 title: 'Configuración del Sistema',
                 href: '/admin/settings',
